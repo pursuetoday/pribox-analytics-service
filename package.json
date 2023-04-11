@@ -20,18 +20,24 @@
 		"email": "contact@ateeqazam.me"
 	},
 	"keywords": [
-    "node",
-    "node.js",
-    "es6",
+		"node",
+		"node.js",
+		"es6",
 		"express",
-    "API",
-    "microservice",
+		"API",
+		"microservice",
 		"boilerplate",
-    "starter kit",
+		"starter kit",
 		"starter project"
-  ],
+	],
 	"dependencies": {
-		"express": "^4.18.1"
+		"@azure/msal-node": "^1.17.0",
+		"@microsoft/microsoft-graph-client": "^3.0.5",
+		"express": "^4.18.1",
+		"isomorphic-fetch": "^3.0.0",
+		"moment": "^2.29.4",
+		"mongoose": "^7.0.3",
+		"node-cron": "^3.0.2"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.18.6",
