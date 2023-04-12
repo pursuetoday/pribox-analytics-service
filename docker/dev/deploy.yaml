@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pribox-analytics-service
+  namespace: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: pribox-analytics-service
+  template:
+    metadata:
+      labels:
+        name: pribox-analytics-service
+    spec:
+      containers:
+      - image: pribox.azurecr.io/pribox-api
+        imagePullPolicy: Always
+        name: pribox-analytics-service
+        envFrom:
+        - secretRef:
+            name: "config-pribox-analytics-service"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: pribox-analytics-service
+  name: pribox-analytics-service
+  namespace: dev
+  labels:
+    name: pribox-analytics-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http 
+    port: 5003
+    targetPort: 5003
+  selector:
+    name: pribox-analytics-service
+---
