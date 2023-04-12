@@ -14,7 +14,7 @@ spec:
         name: pribox-analytics-service
     spec:
       containers:
-      - image: pribox.azurecr.io/pribox-api
+      - image: pribox.azurecr.io/pribox-analytics-service-dev
         imagePullPolicy: Always
         name: pribox-analytics-service
         envFrom:
