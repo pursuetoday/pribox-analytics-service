@@ -18,6 +18,9 @@ const Schema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "campaign_flow.emailVariants",
 		},
+		messageId: {
+			type: String,
+		},
 		prospectId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "prospect",

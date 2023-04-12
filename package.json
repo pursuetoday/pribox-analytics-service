@@ -34,10 +34,13 @@
 		"@azure/msal-node": "^1.17.0",
 		"@microsoft/microsoft-graph-client": "^3.0.5",
 		"express": "^4.18.1",
+		"imap-simple": "^5.1.0",
 		"isomorphic-fetch": "^3.0.0",
+		"mailparser": "^3.6.4",
 		"moment": "^2.29.4",
 		"mongoose": "^7.0.3",
-		"node-cron": "^3.0.2"
+		"node-cron": "^3.0.2",
+		"nodemailer": "^6.9.1"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.18.6",
