@@ -53,10 +53,13 @@ export class AnalyticExecution {
 						if (await this.emailReplies(messageId)) {
 							receivedReplies++;
 						}
-						await Campaign.updateCampaignAnalytic(
-							{ _id: campaignAnalytic._id },
-							{ receivedReplies }
-						);
+						if (receivedReplies > 0) {
+							await Campaign.updateCampaignAnalytic(
+								{ _id: campaignAnalytic._id },
+								{ receivedReplies }
+							);
+						}
+
 					}
 				}
 				await this.closeImap();
