@@ -2,6 +2,8 @@ import { parseOutlookMessage } from "../../utils/parseEmail";
 import { getApiClient as getOutlookApiClient } from "../../core/outlookOAuth";
 import { Campaign } from "../campaign";
 import Imap from "../../core/imap";
+import { msInHour } from "../../constant/timeConstant";
+import { PageIterator } from "@microsoft/microsoft-graph-client";
 
 export class AnalyticExecution {
 	campaign = {};
@@ -128,7 +130,12 @@ export class AnalyticExecution {
 			const inboxEmails = await this.imap.search([
 				["HEADER", "In-Reply-To", messageId],
 			]);
-			console.log("inboxEmails  reply-----", inboxEmails, messageId);
+			console.log(
+				"inboxEmails  reply-----",
+				inboxEmails,
+				inboxEmails && inboxEmails[0]?.attributes.flags,
+				messageId
+			);
 			if (inboxEmails.length) {
 				console.log("/true");
 				return true;

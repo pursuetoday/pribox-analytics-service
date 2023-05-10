@@ -5,7 +5,7 @@ class AnalyticScheduler {
 	campaigns = [];
 
 	constructor() {
-		console.clear();
+		// console.clear();
 	}
 	async init() {
 		console.log("campaign analytic scheduler init");
