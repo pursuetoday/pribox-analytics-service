@@ -20,7 +20,7 @@ export class AnalyticExecution {
 		console.log(
 			`campaign analytic Execution init for campaign ${this.campaign.name}`
 		);
-		this.senders = await Campaign.getSenders([this.campaign.sender]);
+		this.senders = await Campaign.getSenders(this.campaign.sender);
 		this.campaignAnalytics = await Campaign.getCampaignAnalytic({
 			campaignId: this.campaign._id,
 		});
@@ -59,7 +59,6 @@ export class AnalyticExecution {
 								{ receivedReplies }
 							);
 						}
-
 					}
 				}
 				await this.closeImap();
@@ -129,11 +128,7 @@ export class AnalyticExecution {
 			const inboxEmails = await this.imap.search([
 				["HEADER", "In-Reply-To", messageId],
 			]);
-			console.log(
-				"inboxEmails  reply-----",
-				inboxEmails,
-				messageId
-			);
+			console.log("inboxEmails  reply-----", inboxEmails, messageId);
 			if (inboxEmails.length) {
 				console.log("/true");
 				return true;
