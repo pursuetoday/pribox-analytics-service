@@ -1,11 +1,10 @@
-export const getJobId = (campaignId, flowItemId, prospectId) => {
-	return `${campaignId}-${flowItemId}-${prospectId}`;
+export const generateJobId = (queueTitle, campaignId) => {
+	return `${queueTitle}-${campaignId}`;
 };
 export const getJobIdObj = (jobId) => {
-	const [campaignId, flowItemId, prospectId] = jobId.split("-");
+	const [queueTitle, campaignId] = jobId.split("-");
 	return {
+		queueTitle,
 		campaignId,
-		flowItemId,
-		prospectId,
 	};
 };

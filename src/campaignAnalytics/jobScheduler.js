@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import analyticScheduler from "./analyticScheduler/analyticScheduler";
+import analyticScheduler from "./analyticSchedule/analyticScheduler";
 
 export default function jobScheduler() {
 	try {
