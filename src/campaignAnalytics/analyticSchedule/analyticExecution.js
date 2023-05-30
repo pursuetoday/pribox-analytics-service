@@ -38,17 +38,36 @@ async function processAnalyticExecutioner(campaign) {
 			for (const campaignAnalytic of filterCampaignAnalytics) {
 				const messageId = campaignAnalytic.messageId;
 				let receivedReplies = campaignAnalytic.receivedReplies;
+				let emailsBounced = campaignAnalytic.emailsBounced;
 				// console.log("receivedReplies----", receivedReplies);
 				if (!receivedReplies) {
-					if (await emailReplies({ messageId, sender, imap })) {
-						receivedReplies++;
+					if (sender.provider === "outlook") {
+						if (await outlookReplies(messageId, sender)) {
+							receivedReplies++;
+						}
+					} else {
+						const inboxEmails = await imap.search([
+							["HEADER", "In-Reply-To", messageId],
+						]);
+
+						// console.log(
+						// 	"reply-------------------------",
+						// 	inboxEmails,
+						// 	inboxEmails && inboxEmails[0]?.attributes.flags,
+						// 	messageId,
+						// 	sender.email
+						// );
+						if (inboxEmails[0]?.attributes?.flags?.includes("\\Bounced")) {
+							if (!emailsBounced) emailsBounced++;
+						} else {
+							if (inboxEmails.length) receivedReplies++;
+						}
 					}
-					if (receivedReplies > 0) {
-						await Campaign.updateCampaignAnalytic(
-							{ _id: campaignAnalytic._id },
-							{ receivedReplies }
-						);
-					}
+
+					await Campaign.updateCampaignAnalytic(
+						{ _id: campaignAnalytic._id },
+						{ receivedReplies, emailsBounced }
+					);
 				}
 			}
 			await imap.closeImap();
@@ -57,24 +76,22 @@ async function processAnalyticExecutioner(campaign) {
 	}
 }
 
-function imapConnection(sender) {
-	return new Promise(async (resolve, reject) => {
-		try {
-			let imap = await Imap.connect({ mailbox: sender });
-			imap.connection.on("error", function (e) {
-				console.log("connection error", e);
-			});
-			const inboxFolder = await imap.getInboxFolder();
-			console.log("inboxFolder----", inboxFolder);
-			await imap.openFolder(inboxFolder.path);
-			resolve(imap);
-		} catch (e) {
+async function imapConnection(sender) {
+	try {
+		let imap = await Imap.connect({ mailbox: sender });
+		imap.connection.on("error", function (e) {
 			console.log("connection error", e);
-		}
-	});
+		});
+		const inboxFolder = await imap.getInboxFolder();
+		console.log("inboxFolder----", inboxFolder);
+		await imap.openFolder(inboxFolder.path);
+		return imap;
+	} catch (e) {
+		console.log("connection error", e);
+	}
 }
 
-async function emailReplies({ messageId, sender, imap }) {
+async function outlookReplies(messageId, sender) {
 	// console.log("this.#sender.provider-----------------------", this.#sender);
 	if (sender.provider === "outlook") {
 		const folder = "Inbox";
@@ -110,31 +127,15 @@ async function emailReplies({ messageId, sender, imap }) {
 		} else {
 			return false;
 		}
-	} else {
-		const inboxEmails = await imap.search([
-			["HEADER", "In-Reply-To", messageId],
-		]);
-		log(
-			`inboxEmails  reply----- ${inboxEmails}
-			${inboxEmails && inboxEmails[0]?.attributes.flags}
-			${messageId}
-			${sender.email}`
-		);
-		if (inboxEmails.length) {
-			log("/true");
-			return true;
-		} else {
-			log("/false");
-			return false;
-		}
 	}
 }
 
 async function analyticExecutioner(campaign) {
 	try {
+		log("execution start------------");
 		await processAnalyticExecutioner(campaign);
 	} catch (err) {
-		log(`Campaign Email execution Error: ${err?.message || err} `, {
+		log(`Campaign analytics execution Error: ${err?.message || err} `, {
 			error: true,
 			debug: true,
 		});

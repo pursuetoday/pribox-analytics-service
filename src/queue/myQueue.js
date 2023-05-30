@@ -2,7 +2,7 @@ import _ from "lodash";
 import Queue from "bull";
 import { REDIS_CONFIG } from "../config";
 
-const prefixTitle = 'pribox-analytic-service'
+const prefixTitle = "pribox-analytic-service";
 
 export default class MyQueue {
 	queue;
@@ -33,7 +33,6 @@ export default class MyQueue {
 		});
 	}
 	process(jobFunc) {
-        
 		this.queue.process(this.queueTitle, jobFunc);
 
 		this.queue.on("error", (error) => {
@@ -67,6 +66,6 @@ export default class MyQueue {
 	}
 
 	baseMessage(job = {}) {
-		`${this.queueTitle} Job: ${_.get(job, "data.jobName")}: `;
+		`${this.queueTitle} Job: ${job.id}`;
 	}
 }

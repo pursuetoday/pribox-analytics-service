@@ -5,6 +5,7 @@ import {
 } from "../queues";
 import { generateJobId } from "../../utils/jobId";
 import log from "../../utils/log";
+import moment from "moment";
 
 async function processAnalyticScheduler() {
 	const query = {
@@ -21,17 +22,27 @@ async function processAnalyticScheduler() {
 	log(`campaign analytic scheduler init campaignsLength ${campaigns?.length}`);
 
 	for (const campaign of campaigns) {
-		const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
-		const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
-		if (!currentJob) {
-			campaignAnalyticExecutionQueue.add(
-				campaignAnalyticExecutionTitle,
-				campaign,
-				{
-					// delay: 5000,
-					jobId,
-				}
-			);
+		const analyticEndDate = moment(campaign?.duration?.endingAt).add(
+			25,
+			"days"
+		);
+			console.log("-----------------11------deee")
+        
+		if (moment().isBefore(analyticEndDate)) {
+			console.log("-----------------------deee")
+			const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
+			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
+			if (!currentJob) {
+			console.log("-----------------3------deee")
+				campaignAnalyticExecutionQueue.add(
+					campaignAnalyticExecutionTitle,
+					campaign,
+					{
+						// delay: 5000,
+						jobId,
+					}
+				);
+			}
 		}
 	}
 }

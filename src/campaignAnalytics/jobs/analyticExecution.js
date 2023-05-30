@@ -7,13 +7,8 @@ async function processAnalyticExecution(campaign, done) {
 		log("campaign analytic Execution Job starts", {
 			campaignName: campaign?.name,
 		});
-		const analyticEndDate = moment(campaign?.duration?.endingAt).add(
-			25,
-			"days"
-		);
-		if (analyticEndDate.isBefore()) {
-			await analyticExecutioner(campaign);
-		}
+
+		await analyticExecutioner(campaign);
 
 		return { res: true };
 	} catch (err) {
