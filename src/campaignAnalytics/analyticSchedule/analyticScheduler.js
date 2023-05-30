@@ -26,14 +26,11 @@ async function processAnalyticScheduler() {
 			25,
 			"days"
 		);
-			console.log("-----------------11------deee")
         
 		if (moment().isBefore(analyticEndDate)) {
-			console.log("-----------------------deee")
 			const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
 			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
 			if (!currentJob) {
-			console.log("-----------------3------deee")
 				campaignAnalyticExecutionQueue.add(
 					campaignAnalyticExecutionTitle,
 					campaign,
