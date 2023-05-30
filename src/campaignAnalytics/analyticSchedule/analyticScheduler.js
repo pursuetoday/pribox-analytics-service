@@ -22,13 +22,17 @@ async function processAnalyticScheduler() {
 
 	for (const campaign of campaigns) {
 		const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
-		// const currentJob = await campaignAnalyticExecution.getJob(jobId);
-		// if (!currentJob) {
-			campaignAnalyticExecutionQueue.add(campaignAnalyticExecutionTitle, campaign, {
-			// delay: 5000,
-			jobId,
-		});
-		// }
+		const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
+		if (!currentJob) {
+			campaignAnalyticExecutionQueue.add(
+				campaignAnalyticExecutionTitle,
+				campaign,
+				{
+					// delay: 5000,
+					jobId,
+				}
+			);
+		}
 	}
 }
 
