@@ -40,24 +40,34 @@ async function processAnalyticExecutioner(campaign) {
 				let receivedReplies = campaignAnalytic.receivedReplies;
 				let emailsBounced = campaignAnalytic.emailsBounced;
 				// console.log("receivedReplies----", receivedReplies);
-				if (!receivedReplies) {
+				if (!receivedReplies && !emailsBounced) {
 					if (sender.provider === "outlook") {
 						if (await outlookReplies(messageId, sender)) {
 							receivedReplies++;
 						}
 					} else {
-						const inboxEmails = await imap.search([
-							["HEADER", "In-Reply-To", messageId],
-						]);
+						const fetchOptions = {
+							bodies: ["HEADER"],
+						};
+						const inboxEmails = await imap.search(
+							[["HEADER", "In-Reply-To", messageId]],
+							fetchOptions
+						);
 
 						// console.log(
 						// 	"reply-------------------------",
 						// 	inboxEmails,
 						// 	inboxEmails && inboxEmails[0]?.attributes.flags,
+						// 	inboxEmails &&
+						// 		inboxEmails[0]?.parts[0].body["x-failed-recipients"],
+
 						// 	messageId,
 						// 	sender.email
 						// );
-						if (inboxEmails[0]?.attributes?.flags?.includes("\\Bounced")) {
+						if (
+							inboxEmails &&
+							inboxEmails[0]?.parts[0].body["x-failed-recipients"]?.length > 0
+						) {
 							if (!emailsBounced) emailsBounced++;
 						} else {
 							if (inboxEmails.length) receivedReplies++;
