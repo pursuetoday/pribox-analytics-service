@@ -9,7 +9,7 @@ import moment from "moment";
 
 async function processAnalyticScheduler() {
 	const query = {
-		status: "active",
+		status: { $nin: ["ready", "draft"] },
 		deletedAt: null,
 		// createdAt: {
 		// 	// 35 minutes ago (from now)
@@ -26,7 +26,7 @@ async function processAnalyticScheduler() {
 			25,
 			"days"
 		);
-
+        
 		if (moment().isBefore(analyticEndDate)) {
 			const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
 			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
