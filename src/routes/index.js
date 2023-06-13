@@ -1,5 +1,7 @@
 import express from "express";
 import { getAnalyticsRedisQueueCount } from "../controller/redis";
+import { runCampaignScript } from "../controller/runCamapaignAnalyticsScript";
+
 
 const router = express.Router();
 
@@ -10,5 +12,9 @@ router.get(
 	"/campaign-analytics/redis-queue-count",
 	getAnalyticsRedisQueueCount
 );
+
+// campaign script 
+router.use("/run-campaign-script", runCampaignScript);
+
 
 export default router;

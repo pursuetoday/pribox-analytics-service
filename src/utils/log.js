@@ -6,8 +6,8 @@ function log(message, params = {}) {
 	consoleLog(message, data);
 
 	if (debug && process.env.NODE_ENV !== "pre-dev") {
-		// const variant = error ? "error" : "none";
-		// slack(message, data, variant);
+		const variant = error ? "error" : "none";
+		slack(message, data, variant);
 	}
 }
 

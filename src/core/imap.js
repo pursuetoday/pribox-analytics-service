@@ -60,6 +60,10 @@ export default class Imap {
     }
   }
 
+  async markAsSeen(uid) {
+    return this.connection.addFlags(uid, "\\Seen");
+  }
+
   async getInboxFolder() {
     if (!this.folders) {
       await this.getFolders();
