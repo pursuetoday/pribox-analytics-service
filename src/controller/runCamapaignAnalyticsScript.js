@@ -1,9 +1,11 @@
 import { campaignAnalyticTestScript } from "../services/campaignAnalyticTestScript.js";
+import log from "../utils/log.js";
 
 export const runCampaignScript = async (req, res, next) => {
 	const { campaignId, sender } = req.query;
 	try {
-		console.log(`campaignId: ${campaignId}`, `sender: ${sender}`);
+		log(`campaignId: ${campaignId}`, `sender: ${sender}`, { debug: true });
+
 		const campaign = await campaignAnalyticTestScript(campaignId, sender);
 
 		// const prospects = await getProspects(campaign);
