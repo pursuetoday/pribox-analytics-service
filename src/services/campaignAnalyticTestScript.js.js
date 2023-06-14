@@ -15,14 +15,14 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 
 		const emailProspect = prospects.map((e) => e.email);
 
-		log(
-			`emailProspect ${emailProspect} , campaign: ${campaign} , prospects: ${prospects}`,
-			{ debug: true }
-		);
+		// log(
+		// 	`emailProspect ${emailProspect} , campaign: ${campaign} , prospects: ${prospects}`,
+		// 	{ debug: true }
+		// );
 
 		const receivers = await Campaign.getSendersByEmails(emailProspect);
 
-		log(`receivers ${receivers}`, { debug: true });
+		// log(`receivers ${receivers}`, { debug: true });
 
 		for (const receiver of receivers) {
 			if (receiver?.provider === "outlook") {
@@ -49,10 +49,10 @@ async function interactViaIMAP(receiver, sender) {
 	const inboxFolder = await imap.getInboxFolder();
 	await imap.openFolder(inboxFolder.path);
 	const inboxEmails = await imap.search([["UNSEEN"], ["SINCE", new Date()]]);
-	log(`inboxEmails ${inboxEmails?.length}`, { debug: true });
+	// log(`inboxEmails ${inboxEmails?.length}`, { debug: true });
 
 	for (const element of inboxEmails) {
-		const { uid } = element.attributes;
+		// const { uid } = element.attributes;
 
 		const messageBody = element?.parts;
 		const from = messageBody[1]?.body?.from;
@@ -63,7 +63,7 @@ async function interactViaIMAP(receiver, sender) {
 			const s2 = s1.split(">")[0];
 			return s2 === sender;
 		});
-		log(`isSenderMatch ${isSenderMatch}`, { debug: true });
+		// log(`isSenderMatch ${isSenderMatch}`, { debug: true });
 
 		if (isSenderMatch) {
 			log(`message ${message}`, { debug: true });
@@ -135,6 +135,7 @@ const clickOnLink = async (url) => {
 			error,
 			debug: true,
 		});
+		if (error) return true;
 	}
 };
 
