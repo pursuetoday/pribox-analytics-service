@@ -31,6 +31,7 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 				await interactViaIMAP(receiver, sender);
 			}
 		}
+    return true
 	} catch (error) {
 		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
 			debug: true,
