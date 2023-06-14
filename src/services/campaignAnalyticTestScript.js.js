@@ -69,10 +69,16 @@ async function interactViaIMAP(receiver, sender) {
 			log(`message ${message}`, { debug: true });
 
 			const url = filterURL("a", "href", message);
-			if (url) {
-				await clickOnLink(url);
-				await imap.markAsSeen(uid);
-			}
+			const url2 = filterURL("img", "src", message);
+
+			log(`Url for google:- ${url}`, {
+				debug: true,
+			});
+			if (url) await clickOnLink(url);
+
+			if (url2) await clickOnLink(url2);
+
+			// await imap.markAsSeen(uid);
 		}
 	}
 	await imap.closeImap();
@@ -95,30 +101,27 @@ async function interactViaOutlook(toMailbox, sender) {
 		(v) => v.sender.emailAddress.address === sender
 	);
 	log(`messageObj ${messageObj}`, { debug: true });
-	log(`Url for clearURL:- ${clearURL}`, {
-		debug: true,
-	});
 
 	if (messageObj) {
 		const message = messageObj.body.content;
 
 		const url = filterURL("a", "href", message);
-		// const url2 = filterURL("img", "src", message);
-		log(`Url for clearURL:- ${clearURL}`, {
+		const url2 = filterURL("img", "src", message);
+		log(`Url for outlook:- ${url}`, {
 			debug: true,
 		});
 		if (url) await clickOnLink(url);
 
-		// if (url2) await clickOnLink(url2);
+		if (url2) await clickOnLink(url2);
 
-		await client.api(`/me/messages/${messageObj.id}`).update({ isRead: true });
+		// await client.api(`/me/messages/${messageObj.id}`).update({ isRead: true });
 	}
 }
 const clickOnLink = async (url) => {
 	const clearURL = url.replace(/"/g, "");
-	log(`Url for clearURL:- ${clearURL}`, {
-		debug: true,
-	});
+	// log(`Url for clearURL:- ${clearURL}`, {
+	// 	debug: true,
+	// });
 	try {
 		const res = await axios.get(clearURL);
 		if (res) {
