@@ -14,7 +14,7 @@ router.get(
 );
 
 // campaign script 
-router.use("/run-campaign-script", runCampaignScript);
+router.get("/run-campaign-script", runCampaignScript);
 
 
 export default router;

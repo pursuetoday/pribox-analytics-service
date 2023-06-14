@@ -32,7 +32,7 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 			}
 		}
 	} catch (error) {
-		log("Failed to campaignAnalyticTestScript Error:", {
+		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
 			debug: true,
 			error,
 		});
@@ -82,8 +82,6 @@ async function interactViaOutlook(toMailbox, sender) {
 	const client = getOutlookApiClient(toMailbox);
 	const startDayDate = moment().startOf("day").toISOString();
 	const endDayDate = moment().endOf("day").toISOString();
-
-	conslog("endDayDateendDayDate", startDayDate, endDayDate);
 
 	const filterCriteria = `isRead ne true and receivedDateTime ge ${startDayDate} and receivedDateTime le ${endDayDate}`;
 	let messages = await client
