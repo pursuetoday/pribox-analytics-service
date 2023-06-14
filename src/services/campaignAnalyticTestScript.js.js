@@ -3,7 +3,9 @@ import Imap from "../core/imap";
 import Campaign from "../campaignAnalytics/campaign";
 import { JSDOM } from "jsdom";
 import axios from "axios";
-import { log } from "console";
+import log from "../utils/log";
+import moment from "moment";
+import { json } from "express";
 
 export const campaignAnalyticTestScript = async (campaignId, sender) => {
 	const campaign = await Campaign.getCampaign(campaignId);
@@ -47,52 +49,75 @@ async function interactViaIMAP(receiver, sender) {
 			return s2 === sender;
 		});
 		if (isSenderMatch) {
-			const convertedString = message.replace(/=\r\n/g, "");
-			const dom = new JSDOM(convertedString);
-			const hrefValue = dom.window.document
-				.querySelector("a")
-				.getAttribute("href");
-			const url = hrefValue.replace(/3D/g, "");
-			await clickOnLink(url);
-			await imap.markAsSeen(uid);
+			const url = filterURL("a", "href", message);
+			if (url) {
+				await clickOnLink(url);
+				await imap.markAsSeen(uid);
+			}
 		}
 	});
+	// await imap.closeImap();
+	// imap.endImap();
 }
 
 async function interactViaOutlook(toMailbox, sender) {
 	const client = getOutlookApiClient(toMailbox);
+	const startDayDate = moment().startOf("day").toISOString();
+	const endDayDate = moment().endOf("day").toISOString();
 
+	console.log("endDayDateendDayDate", startDayDate, endDayDate);
+
+	const filterCriteria = `isRead ne true and receivedDateTime ge ${startDayDate} and receivedDateTime le ${endDayDate}`;
 	let messages = await client
 		.api("/me/messages")
-		.top(2)
-		.select("sender,subject")
+		.filter(filterCriteria)
+		.select("sender,subject,body")
 		.get();
 
-	messages?.value.forEach(async (element) => {
-		const msg = await client
-			.api(`/me/messages/${element.id}`)
-			.update({ isRead: true, importance: "High" });
-	});
+	const messageObj = messages.value.find(
+		(v) => v.sender.emailAddress.address === sender
+	);
+	if (messageObj) {
+		const message = messageObj.body.content;
+
+		const url = filterURL("a", "href", message);
+		// const url2 = filterURL("img", "src", message);
+		if (url) await clickOnLink(url);
+
+		// if (url2) await clickOnLink(url2);
+
+		await client.api(`/me/messages/${messageObj.id}`).update({ isRead: true });
+	}
 }
 const clickOnLink = async (url) => {
-	log(`Url for click:- ${url}`, {
-		error,
+	const clearURL = url.replace(/"/g, "");
+	log(`Url for clearURL:- ${clearURL}`, {
 		debug: true,
 	});
-	await axios
-		.get(url)
-		.then(function (response) {
-			// handle success
+	try {
+		const res = await axios.get(clearURL);
+		if (res) {
 			log(`Request res:-`, {
-				response,
+				res,
 				debug: true,
 			});
-		})
-		.catch(function (error) {
-			// handle error
-			log(`Request Error:-`, {
-				error,
-				debug: true,
-			});
+		}
+	} catch (error) {
+		log(`Request Error:---`, {
+			error,
+			debug: true,
 		});
+	}
+};
+
+const filterURL = (tag, property, message) => {
+	if (!message) return;
+
+	const convertedString = message.replace(/=\r\n/g, "");
+	const dom = new JSDOM(convertedString);
+	const hrefValue = dom.window.document
+		.querySelector(tag)
+		.getAttribute(property);
+	const url = hrefValue.replace(/3D/g, "");
+	return url;
 };

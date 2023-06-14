@@ -1,3 +1,5 @@
+import slack from "./slack";
+
 function log(message, params = {}) {
 	const { debug, error, ...restParams } = params || {};
 

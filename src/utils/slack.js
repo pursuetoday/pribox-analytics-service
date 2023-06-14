@@ -17,7 +17,7 @@ export default async function slack(message, pretext, variant = 'none', extra) {
     const slackMessageBody = {
       attachments: [
         {
-          title: `Pribox.Campaign.Simulator [${shortenedEnvs[process.env.NODE_ENV]}] ${
+          title: `Pribox.Analytic.Service [${shortenedEnvs[process.env.NODE_ENV]}] ${
             variant === 'error' ? 'ERROR' : ''
           }: ${pretext}`,
           text: `${parseMessage(message)}
@@ -33,7 +33,7 @@ export default async function slack(message, pretext, variant = 'none', extra) {
       headers: { 'content-type': 'application/json' },
     });
   } catch (e) {
-    console.log('slack error: ', e);
+    console.log('slack error: ', e.message);
   }
 }
 
