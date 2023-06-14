@@ -6,11 +6,13 @@ export const runCampaignScript = async (req, res, next) => {
 	try {
 		log(`campaignId: ${campaignId} sender: ${sender}`, { debug: true });
 
-		await campaignAnalyticTestScript(campaignId, sender);
-
-		res.status(200).send({ linkClick: true });
+		const camp = await campaignAnalyticTestScript(campaignId, sender);
+		if (camp) res.status(200).send({ linkClick: true });
 	} catch (error) {
-		console.log(error, "Failed to execute mailbox sync on email sent", "error");
+		log("Failed to runCampaignScript Error:", {
+			debug: true,
+			error,
+		});
 		console.error(error);
 	}
 	next();

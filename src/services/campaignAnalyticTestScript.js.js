@@ -5,24 +5,37 @@ import { JSDOM } from "jsdom";
 import axios from "axios";
 import log from "../utils/log";
 import moment from "moment";
-import { json } from "express";
 
 export const campaignAnalyticTestScript = async (campaignId, sender) => {
-	const campaign = await Campaign.getCampaign(campaignId);
-	const prospects = await Campaign.getProspects(campaign);
-	let emailProspect = [];
-	prospects?.forEach((element) => {
-		emailProspect.push(element.email);
-	});
+	try {
+		log(`campaignId with start ${campaignId}`, { debug: true });
 
-	const receivers = await Campaign.getSendersByEmails(emailProspect);
+		const campaign = await Campaign.getCampaign(campaignId);
+		const prospects = await Campaign.getProspects(campaign);
 
-	for (const receiver of receivers) {
-		if (receiver?.provider === "outlook") {
-			await interactViaOutlook(receiver._id, sender);
-		} else {
-			await interactViaIMAP(receiver, sender);
+		const emailProspect = prospects.map((e) => e.email);
+
+		log(
+			`emailProspect ${emailProspect} , campaign: ${campaign} , prospects: ${prospects}`,
+			{ debug: true }
+		);
+
+		const receivers = await Campaign.getSendersByEmails(emailProspect);
+
+		log(`receivers ${receivers}`, { debug: true });
+
+		for (const receiver of receivers) {
+			if (receiver?.provider === "outlook") {
+				await interactViaOutlook(receiver._id, sender);
+			} else {
+				await interactViaIMAP(receiver, sender);
+			}
 		}
+	} catch (error) {
+		log("Failed to campaignAnalyticTestScript Error:", {
+			debug: true,
+			error,
+		});
 	}
 };
 async function interactViaIMAP(receiver, sender) {
@@ -35,6 +48,7 @@ async function interactViaIMAP(receiver, sender) {
 	const inboxFolder = await imap.getInboxFolder();
 	await imap.openFolder(inboxFolder.path);
 	const inboxEmails = await imap.search([["UNSEEN"], ["SINCE", new Date()]]);
+	log(`inboxEmails ${inboxEmails?.length}`, { debug: true });
 
 	for (const element of inboxEmails) {
 		const { uid } = element.attributes;
@@ -48,7 +62,11 @@ async function interactViaIMAP(receiver, sender) {
 			const s2 = s1.split(">")[0];
 			return s2 === sender;
 		});
+		log(`isSenderMatch ${isSenderMatch}`, { debug: true });
+
 		if (isSenderMatch) {
+			log(`message ${message}`, { debug: true });
+
 			const url = filterURL("a", "href", message);
 			if (url) {
 				await clickOnLink(url);
@@ -65,7 +83,7 @@ async function interactViaOutlook(toMailbox, sender) {
 	const startDayDate = moment().startOf("day").toISOString();
 	const endDayDate = moment().endOf("day").toISOString();
 
-	console.log("endDayDateendDayDate", startDayDate, endDayDate);
+	conslog("endDayDateendDayDate", startDayDate, endDayDate);
 
 	const filterCriteria = `isRead ne true and receivedDateTime ge ${startDayDate} and receivedDateTime le ${endDayDate}`;
 	let messages = await client
@@ -77,6 +95,8 @@ async function interactViaOutlook(toMailbox, sender) {
 	const messageObj = messages.value.find(
 		(v) => v.sender.emailAddress.address === sender
 	);
+	log(`messageObj ${messageObj}`, { debug: true });
+
 	if (messageObj) {
 		const message = messageObj.body.content;
 
@@ -103,7 +123,7 @@ const clickOnLink = async (url) => {
 			});
 		}
 	} catch (error) {
-		log(`Request Error:---`, {
+		log(`Request Error for test campaign script:---`, {
 			error,
 			debug: true,
 		});
