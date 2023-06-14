@@ -31,7 +31,7 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 				await interactViaIMAP(receiver, sender);
 			}
 		}
-    return true
+		return true;
 	} catch (error) {
 		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
 			debug: true,
@@ -95,12 +95,18 @@ async function interactViaOutlook(toMailbox, sender) {
 		(v) => v.sender.emailAddress.address === sender
 	);
 	log(`messageObj ${messageObj}`, { debug: true });
+	log(`Url for clearURL:- ${clearURL}`, {
+		debug: true,
+	});
 
 	if (messageObj) {
 		const message = messageObj.body.content;
 
 		const url = filterURL("a", "href", message);
 		// const url2 = filterURL("img", "src", message);
+		log(`Url for clearURL:- ${clearURL}`, {
+			debug: true,
+		});
 		if (url) await clickOnLink(url);
 
 		// if (url2) await clickOnLink(url2);

@@ -1,4 +1,4 @@
-import slack from "./slack";
+// import slack from "./slack";
 
 function log(message, params = {}) {
 	const { debug, error, ...restParams } = params || {};
@@ -9,7 +9,7 @@ function log(message, params = {}) {
 
 	if (debug && process.env.NODE_ENV !== "pre-dev") {
 		const variant = error ? "error" : "none";
-		slack(message, data, variant);
+		// slack(message, data, variant);
 	}
 }
 
