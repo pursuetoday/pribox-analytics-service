@@ -36,7 +36,7 @@ async function interactViaIMAP(receiver, sender) {
 	await imap.openFolder(inboxFolder.path);
 	const inboxEmails = await imap.search([["UNSEEN"], ["SINCE", new Date()]]);
 
-	inboxEmails.forEach(async (element, i) => {
+	for (const element of inboxEmails) {
 		const { uid } = element.attributes;
 
 		const messageBody = element?.parts;
@@ -55,9 +55,9 @@ async function interactViaIMAP(receiver, sender) {
 				await imap.markAsSeen(uid);
 			}
 		}
-	});
-	// await imap.closeImap();
-	// imap.endImap();
+	}
+	await imap.closeImap();
+	imap.endImap();
 }
 
 async function interactViaOutlook(toMailbox, sender) {
