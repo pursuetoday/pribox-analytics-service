@@ -52,7 +52,7 @@ async function interactViaIMAP(receiver, sender) {
 	// log(`inboxEmails ${inboxEmails?.length}`, { debug: true });
 
 	for (const element of inboxEmails) {
-		// const { uid } = element.attributes;
+		const { uid } = element.attributes;
 
 		const messageBody = element?.parts;
 		const from = messageBody[1]?.body?.from;
@@ -78,7 +78,7 @@ async function interactViaIMAP(receiver, sender) {
 
 			if (url2) await clickOnLink(url2);
 
-			// await imap.markAsSeen(uid);
+			await imap.markAsSeen(uid);
 		}
 	}
 	await imap.closeImap();
@@ -114,7 +114,7 @@ async function interactViaOutlook(toMailbox, sender) {
 
 		if (url2) await clickOnLink(url2);
 
-		// await client.api(`/me/messages/${messageObj.id}`).update({ isRead: true });
+		await client.api(`/me/messages/${messageObj.id}`).update({ isRead: true });
 	}
 }
 const clickOnLink = async (url) => {
