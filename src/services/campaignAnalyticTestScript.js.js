@@ -99,8 +99,8 @@ async function interactViaOutlook(toMailbox, sender) {
 
 	log(`messages ${messages}`, { debug: true });
 
-	for (const v of messages?.value) {
-		if (v.sender.emailAddress.address === sender) {
+	for (const messageObj of messages?.value) {
+		if (messageObj.sender.emailAddress.address === sender) {
 			const message = messageObj.body.content;
 
 			const url = filterURL("a", "href", message);
