@@ -74,7 +74,14 @@ async function interactViaIMAP(receiver, sender) {
 			log(`Url for google:- ${url}`, {
 				debug: true,
 			});
-			if (url) await clickOnLink(url);
+			if (url) {
+				const baseUrl = "http://localhost:5002/api/";
+				const urlType = url.split("?")[0].replace(baseUrl, "");
+				const filterUrlType = urlType.replace('"', "");
+				if (filterUrlType === "link") {
+					await clickOnLink(url);
+				}
+			}
 
 			if (url2) await clickOnLink(url2);
 

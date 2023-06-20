@@ -35,16 +35,23 @@ async function processAnalyticExecutioner(campaign) {
 			if (sender.provider !== "outlook") {
 				imap = await imapConnection(sender);
 			}
+
+			console.log("filterCampaignAnalytics", filterCampaignAnalytics.length);
 			for (const campaignAnalytic of filterCampaignAnalytics) {
 				const messageId = campaignAnalytic.messageId;
 				let receivedReplies = campaignAnalytic.receivedReplies;
 				let emailsBounced = campaignAnalytic.emailsBounced;
-				// console.log("receivedReplies----", receivedReplies);
 				if (!receivedReplies && !emailsBounced) {
 					if (sender.provider === "outlook") {
-						if (await outlookReplies(messageId, sender)) {
-							receivedReplies++;
-						}
+						const { reply, bounceEmail } = await outlookReplies(
+							messageId,
+							sender,
+							receivedReplies,
+							emailsBounced
+						);
+						if (!receivedReplies && reply > 0) receivedReplies++;
+
+						if (!emailsBounced && bounceEmail > 0) emailsBounced++;
 					} else {
 						const fetchOptions = {
 							bodies: ["HEADER"],
@@ -80,8 +87,10 @@ async function processAnalyticExecutioner(campaign) {
 					);
 				}
 			}
-			await imap.closeImap();
-			imap.endImap();
+			if (sender.provider !== "outlook") {
+				await imap.closeImap();
+				imap.endImap();
+			}
 		}
 	}
 }
@@ -101,9 +110,14 @@ async function imapConnection(sender) {
 	}
 }
 
-async function outlookReplies(messageId, sender) {
-	// console.log("this.#sender.provider-----------------------", this.#sender);
+async function outlookReplies(messageId, sender, reply, bounceEmail) {
+	// console.log(
+	// 	"sender.provider-----------------------",
+	// 	sender.provider,
+	// 	messageId
+	// );
 	if (sender.provider === "outlook") {
+		const internetMessageId = messageId;
 		const folder = "Inbox";
 		const client = getOutlookApiClient(sender._id);
 		let data = [];
@@ -118,25 +132,33 @@ async function outlookReplies(messageId, sender) {
 			.orderby("createdDateTime")
 			.top(1000)
 			.select(
-				"toRecipients,from,subject,internetMessageId,internetMessageHeaders,body,createdDateTime"
+				"id,toRecipients,from,subject,internetMessageId,internetMessageHeaders,body,replyTo,isDeliveryReceiptRequested,isReadReceiptRequested,createdDateTime"
 			)
 			.get();
-		if (response) {
-			let paginator = new PageIterator(client, response, (message) => {
-				const email = parseOutlookMessage(message, folder);
-				// console.log("email")
-				data.push(email);
-			});
 
-			await paginator.iterate();
+		// console.log("response-------", response.value.length);
+		if (response) {
+			const emails = response.value;
+			for (const email of emails) {
+				const message = parseOutlookMessage(email, folder);
+				console.log("message--------", message.inReplyTo, messageId);
+
+				if (message.inReplyTo === messageId) {
+					// console.log("message--------", message, message.inReplyTo, messageId);
+					const undeliverable = message.subject.split(":")[0];
+					if (undeliverable === "Undeliverable") {
+						bounceEmail++;
+					} else {
+						reply++;
+					}
+				}
+			}
 		}
-		const findMessageId = data.some((v) => v.messageId === messageId);
-		log(`folder----------- ${folder} ${findMessageId}`);
-		if (findMessageId) {
-			return true;
-		} else {
-			return false;
-		}
+
+		return {
+			reply,
+			bounceEmail,
+		};
 	}
 }
 

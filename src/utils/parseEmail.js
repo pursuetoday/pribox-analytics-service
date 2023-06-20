@@ -1,33 +1,34 @@
-import { simpleParser } from 'mailparser';
+import { simpleParser } from "mailparser";
 
 const parserOptions = {
 	skipHtmlToText: true,
 	skipImageLinks: true,
-	skipTextToHtml: true
+	skipTextToHtml: true,
 };
 
 export async function parseEmail(email, label) {
 	const source =
-		'Imap-Id: ' +
+		"Imap-Id: " +
 		email.attributes.uid +
-		'\r\n' +
-		email.parts.find((part) => part.which === '')?.body;
+		"\r\n" +
+		email.parts.find((part) => part.which === "")?.body;
 
 	const parsedEmail = await simpleParser(source, parserOptions);
-	const { to, from, subject, messageId, inReplyTo, date, html, text } = parsedEmail;
+	const { to, from, subject, messageId, inReplyTo, date, html, text } =
+		parsedEmail;
 
 	return {
 		to:
 			to?.value &&
 			to.value.map((obj) => ({
 				email: obj.address,
-				...(obj.name && { name: obj.name })
+				...(obj.name && { name: obj.name }),
 			})),
 		from:
 			from?.value &&
 			from.value.map((obj) => ({
 				email: obj.address,
-				...(obj.name && { name: obj.name })
+				...(obj.name && { name: obj.name }),
 			}))[0],
 		subject,
 		messageId,
@@ -35,10 +36,10 @@ export async function parseEmail(email, label) {
 		body: html || text,
 		labels: [label],
 		tags: email.attributes.flags.map((item) =>
-			item.replace('\\', '').replace('$', '').toLowerCase()
+			item.replace("\\", "").replace("$", "").toLowerCase()
 		),
-		isSpam: ['spam', 'junk', 'bulk mail'].includes(label.toLowerCase()),
-		date
+		isSpam: ["spam", "junk", "bulk mail"].includes(label.toLowerCase()),
+		date,
 	};
 }
 
@@ -47,16 +48,19 @@ export function parseOutlookMessage(email, folder) {
 
 	const inReplyToHeader =
 		email.internetMessageHeaders &&
-		email.internetMessageHeaders.find((header) => header.name === 'In-Reply-To');
+		email.internetMessageHeaders.find(
+			(header) => header.name === "In-Reply-To"
+		);
 
 	return {
+		id: email.id,
 		to: email.toRecipients.map((recipient) => ({
 			name: recipient.emailAddress.name,
-			email: recipient.emailAddress.address
+			email: recipient.emailAddress.address,
 		}))[0],
 		from: {
 			name: email.from.emailAddress.name,
-			email: email.from.emailAddress.address
+			email: email.from.emailAddress.address,
 		},
 		subject: email.subject,
 		messageId: email.internetMessageId,
@@ -64,6 +68,6 @@ export function parseOutlookMessage(email, folder) {
 		body: email.body.content,
 		date: email.createdDateTime,
 		labels: [folder.toLowerCase()],
-		isSpam: folder === 'Junk Email'
+		isSpam: folder === "Junk Email",
 	};
 }
