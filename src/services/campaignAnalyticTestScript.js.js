@@ -66,7 +66,7 @@ async function interactViaIMAP(receiver, sender) {
 		// log(`isSenderMatch ${isSenderMatch}`, { debug: true });
 
 		if (isSenderMatch) {
-			log(`message ${message}`, { debug: true });
+			// log(`message ${message}`, { debug: true });
 
 			const url = filterURL("a", "href", message);
 			const url2 = filterURL("img", "src", message);
