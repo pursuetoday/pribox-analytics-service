@@ -4,7 +4,7 @@ import log from "../utils/log.js";
 export const runCampaignScript = async (req, res, next) => {
 	const { campaignId, sender, open, click } = req.query;
 	try {
-		log(`campaignId: ${campaignId} sender: ${sender}`, { debug: true });
+		log(`campaignId: ${campaignId} sender: ${sender}, open: ${open}, click: ${click}`, { debug: true });
 
 		const camp = await campaignAnalyticTestScript(
 			campaignId,

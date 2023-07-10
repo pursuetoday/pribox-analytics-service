@@ -31,8 +31,9 @@ export const campaignAnalyticTestScript = async (
 		let clickCount = 0;
 
 		for (const receiver of receivers) {
+			console.log("Count..................................", clickCount, click);
 			let isClick;
-			if (clickCount < click) {
+			if (clickCount < parseInt(click)) {
 				isClick = true;
 				clickCount++;
 			} else {
@@ -81,9 +82,7 @@ async function interactViaIMAP(receiver, sender, isClick = false) {
 		if (isSenderMatch) {
 			// log(`message ${message}`, { debug: true });
 
-			log(`Url for google:- ${url}`, {
-				debug: true,
-			});
+
 			if (isClick) {
 				const url = filterURL("a", "href", message);
 				if (url) {
@@ -93,13 +92,22 @@ async function interactViaIMAP(receiver, sender, isClick = false) {
 					if (filterUrlType === "link") {
 						await clickOnLink(url);
 					}
+					
 				}
+
+				log(`Url for google:- ${url}`, {
+					debug: true,
+				});
+				
 			} else {
 				const url2 = filterURL("img", "src", message);
 				if (url2) await clickOnLink(url2);
 			}
 
+
+
 			await imap.markAsSeen(uid);
+
 		}
 	}
 	await imap.closeImap();
