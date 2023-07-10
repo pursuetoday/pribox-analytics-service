@@ -6,7 +6,12 @@ import axios from "axios";
 import log from "../utils/log";
 import moment from "moment";
 
-export const campaignAnalyticTestScript = async (campaignId, sender) => {
+export const campaignAnalyticTestScript = async (
+	campaignId,
+	sender,
+	open,
+	click
+) => {
 	try {
 		log(`campaignId with start ${campaignId}`, { debug: true });
 
@@ -23,12 +28,20 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 		const receivers = await Campaign.getSendersByEmails(emailProspect);
 
 		// log(`receivers ${receivers}`, { debug: true });
+		let clickCount = 0;
 
 		for (const receiver of receivers) {
-			if (receiver?.provider === "outlook") {
-				await interactViaOutlook(receiver._id, sender);
+			let isClick;
+			if (clickCount < click) {
+				isClick = true;
+				clickCount++;
 			} else {
-				await interactViaIMAP(receiver, sender);
+				isClick = false;
+			}
+			if (receiver?.provider === "outlook") {
+				await interactViaOutlook(receiver._id, sender, isClick);
+			} else {
+				await interactViaIMAP(receiver, sender, isClick);
 			}
 		}
 		return true;
@@ -39,7 +52,7 @@ export const campaignAnalyticTestScript = async (campaignId, sender) => {
 		});
 	}
 };
-async function interactViaIMAP(receiver, sender) {
+async function interactViaIMAP(receiver, sender, isClick = false) {
 	const fetchOptions = {
 		bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE)", "TEXT"],
 		markSeen: false,
@@ -68,22 +81,23 @@ async function interactViaIMAP(receiver, sender) {
 		if (isSenderMatch) {
 			// log(`message ${message}`, { debug: true });
 
-			const url = filterURL("a", "href", message);
-			const url2 = filterURL("img", "src", message);
-
 			log(`Url for google:- ${url}`, {
 				debug: true,
 			});
-			if (url) {
-				const baseUrl = "http://localhost:5002/api/";
-				const urlType = url.split("?")[0].replace(baseUrl, "");
-				const filterUrlType = urlType.replace('"', "");
-				if (filterUrlType === "link") {
-					await clickOnLink(url);
+			if (isClick) {
+				const url = filterURL("a", "href", message);
+				if (url) {
+					const baseUrl = "http://localhost:5002/api/";
+					const urlType = url.split("?")[0].replace(baseUrl, "");
+					const filterUrlType = urlType.replace('"', "");
+					if (filterUrlType === "link") {
+						await clickOnLink(url);
+					}
 				}
+			} else {
+				const url2 = filterURL("img", "src", message);
+				if (url2) await clickOnLink(url2);
 			}
-
-			if (url2) await clickOnLink(url2);
 
 			await imap.markAsSeen(uid);
 		}
@@ -92,7 +106,7 @@ async function interactViaIMAP(receiver, sender) {
 	imap.endImap();
 }
 
-async function interactViaOutlook(toMailbox, sender) {
+async function interactViaOutlook(toMailbox, sender, isClick = false) {
 	const client = getOutlookApiClient(toMailbox);
 	const startDayDate = moment().startOf("day").toISOString();
 	const endDayDate = moment().endOf("day").toISOString();
@@ -110,14 +124,24 @@ async function interactViaOutlook(toMailbox, sender) {
 		if (messageObj.sender.emailAddress.address === sender) {
 			const message = messageObj.body.content;
 
-			const url = filterURL("a", "href", message);
-			const url2 = filterURL("img", "src", message);
 			log(`Url for outlook:- ${url}`, {
 				debug: true,
 			});
-			if (url) await clickOnLink(url);
 
-			if (url2) await clickOnLink(url2);
+			if (isClick) {
+				const url = filterURL("a", "href", message);
+				if (url) {
+					const baseUrl = "http://localhost:5002/api/";
+					const urlType = url.split("?")[0].replace(baseUrl, "");
+					const filterUrlType = urlType.replace('"', "");
+					if (filterUrlType === "link") {
+						await clickOnLink(url);
+					}
+				}
+			} else {
+				const url2 = filterURL("img", "src", message);
+				if (url2) await clickOnLink(url2);
+			}
 
 			await client
 				.api(`/me/messages/${messageObj.id}`)

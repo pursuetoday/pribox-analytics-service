@@ -13,7 +13,7 @@ router.get(
 	getAnalyticsRedisQueueCount
 );
 
-// campaign script 
+// campaign test script for open and click
 router.get("/run-campaign-script", runCampaignScript);
 
 
