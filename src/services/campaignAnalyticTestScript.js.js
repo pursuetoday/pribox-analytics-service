@@ -28,16 +28,22 @@ export const campaignAnalyticTestScript = async (
 		const receivers = await Campaign.getSendersByEmails(emailProspect);
 
 		// log(`receivers ${receivers}`, { debug: true });
-		let clickCount = 0;
+		let openCount = 0;
 
 		for (const receiver of receivers) {
-			console.log("Count..................................", clickCount, click);
-			let isClick;
-			if (clickCount < parseInt(click)) {
-				isClick = true;
-				clickCount++;
+			console.log(
+				"Count..................................",
+				openCount,
+				click,
+				open
+			);
+			let isOpen;
+			if (openCount < parseInt(open)) {
+				isOpen = true;
+				openCount++;
 			} else {
-				isClick = false;
+				openCount++;
+				isOpen = false;
 			}
 			if (receiver?.provider === "outlook") {
 				await interactViaOutlook(receiver._id, sender, isClick);
@@ -53,7 +59,7 @@ export const campaignAnalyticTestScript = async (
 		});
 	}
 };
-async function interactViaIMAP(receiver, sender, isClick = false) {
+async function interactViaIMAP(receiver, sender, isOpen = false) {
 	const fetchOptions = {
 		bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE)", "TEXT"],
 		markSeen: false,
@@ -82,8 +88,7 @@ async function interactViaIMAP(receiver, sender, isClick = false) {
 		if (isSenderMatch) {
 			// log(`message ${message}`, { debug: true });
 
-
-			if (isClick) {
+			if (!isOpen) {
 				const url = filterURL("a", "href", message);
 				if (url) {
 					const baseUrl = "http://localhost:5002/api/";
@@ -92,29 +97,24 @@ async function interactViaIMAP(receiver, sender, isClick = false) {
 					if (filterUrlType === "link") {
 						await clickOnLink(url);
 					}
-					
 				}
 
 				log(`Url for google:- ${url}`, {
 					debug: true,
 				});
-				
 			} else {
 				const url2 = filterURL("img", "src", message);
 				if (url2) await clickOnLink(url2);
 			}
 
-
-
 			await imap.markAsSeen(uid);
-
 		}
 	}
 	await imap.closeImap();
 	imap.endImap();
 }
 
-async function interactViaOutlook(toMailbox, sender, isClick = false) {
+async function interactViaOutlook(toMailbox, sender, isOpen = false) {
 	const client = getOutlookApiClient(toMailbox);
 	const startDayDate = moment().startOf("day").toISOString();
 	const endDayDate = moment().endOf("day").toISOString();
@@ -136,7 +136,7 @@ async function interactViaOutlook(toMailbox, sender, isClick = false) {
 				debug: true,
 			});
 
-			if (isClick) {
+			if (!isOpen) {
 				const url = filterURL("a", "href", message);
 				if (url) {
 					const baseUrl = "http://localhost:5002/api/";
