@@ -46,9 +46,9 @@ export const campaignAnalyticTestScript = async (
 				isOpen = false;
 			}
 			if (receiver?.provider === "outlook") {
-				await interactViaOutlook(receiver._id, sender, isClick);
+				await interactViaOutlook(receiver._id, sender, isOpen);
 			} else {
-				await interactViaIMAP(receiver, sender, isClick);
+				await interactViaIMAP(receiver, sender, isOpen);
 			}
 		}
 		return true;
