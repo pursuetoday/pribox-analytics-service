@@ -1,6 +1,6 @@
 import log from "../../utils/log";
 import analyticExecutioner from "../analyticSchedule/analyticExecution";
-import moment from "moment";
+// import moment from "moment";
 
 async function processAnalyticExecution(campaign, done) {
 	try {
@@ -15,6 +15,7 @@ async function processAnalyticExecution(campaign, done) {
 		const errMessage = err?.message || err;
 		log(`Campaign Analytic Execution  Process: Error ${errMessage}`, {
 			campaignId: campaign._id,
+			campaignName: campaign?.name,
 			error: true,
 			debug: true,
 			er: err,

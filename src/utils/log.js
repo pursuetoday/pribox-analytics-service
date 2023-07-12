@@ -2,10 +2,13 @@ import slack from "./slack";
 import * as Sentry from "@sentry/node";
 
 function log(message, params = {}) {
-	const transaction = Sentry.startTransaction({
-		op: "log file",
-		name: "capture error in log file for whole application",
-	});
+	let transaction;
+	if (params.error) {
+		transaction = Sentry.startTransaction({
+			op: "log file",
+			name: "capture error in log file for whole application",
+		});
+	}
 	try {
 		const { debug, error, er, ...restParams } = params || {};
 
