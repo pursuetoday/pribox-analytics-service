@@ -24,12 +24,12 @@ export const PRIBOX_WEB_APP_URI = {
 	undefined: "https://app.pribox.io",
 };
 
-  export const PRIBOX_CAMPAIGN_SIMULATOR_URI = {
-    development: "http://localhost:5002",
-    staging: "https://app-staging.pribox.io", // url should be change
-    production: "https://app.pribox.io",
-    undefined: "https://app.pribox.io",
-  };
+export const PRIBOX_CAMPAIGN_SIMULATOR_URI = {
+	development: "http://localhost:5002",
+	staging: "https://app-staging.pribox.io", // url should be change
+	production: "https://app.pribox.io",
+	undefined: "https://app.pribox.io",
+};
 
 const REDIRECT_URI = PRIBOX_WEB_APP_URI[process.env.NODE_ENV];
 
@@ -47,3 +47,8 @@ export const OUTLOOK_CREDS = {
 	redirect_uri: REDIRECT_URI,
 };
 
+export const SENTRY_DNS =
+	process.env.SENTRY_DNS ||
+	"https://219fe54fe8094347b50cbf8720fba14b@o4505516274941952.ingest.sentry.io/4505516289687552";
+
+export const SENTRY_ENV = process.env.NODE_ENV;

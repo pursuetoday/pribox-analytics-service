@@ -17,7 +17,8 @@ async function processAnalyticExecutioner(campaign) {
 	}
 
 	log(
-		`campaign analytic Execution startExecution for campaign ${campaign.name}`
+		`campaign analytic Execution startExecution for campaign ${campaign.name}`,
+		{ debug: true }
 	);
 
 	for (const sender of senders) {
@@ -26,71 +27,118 @@ async function processAnalyticExecutioner(campaign) {
 		// 	this.campaignAnalytics,
 		// 	this.sender._id
 		// );
-		const filterCampaignAnalytics = campaignAnalytics.filter(
-			(v) => String(v.senderId) === String(sender._id)
-		);
-		// console.log("filterCampaignAnalytics------", filterCampaignAnalytics);
-		let imap;
-		if (filterCampaignAnalytics) {
-			if (sender.provider !== "outlook") {
-				imap = await imapConnection(sender);
-			}
-
-			console.log("filterCampaignAnalytics", filterCampaignAnalytics.length);
-			for (const campaignAnalytic of filterCampaignAnalytics) {
-				const messageId = campaignAnalytic.messageId;
-				let receivedReplies = campaignAnalytic.receivedReplies;
-				let emailsBounced = campaignAnalytic.emailsBounced;
-				if (!receivedReplies && !emailsBounced) {
-					if (sender.provider === "outlook") {
-						const { reply, bounceEmail } = await outlookReplies(
-							messageId,
-							sender,
-							receivedReplies,
-							emailsBounced
+		try {
+			const filterCampaignAnalytics = campaignAnalytics.filter(
+				(v) => String(v.senderId) === String(sender._id)
+			);
+			// console.log("filterCampaignAnalytics------", filterCampaignAnalytics);
+			let imap;
+			if (filterCampaignAnalytics) {
+				if (sender.provider !== "outlook") {
+					imap = await imapConnection(sender).catch((err) => {
+						log(
+							`Imap Error: sender ${sender.email} , provider: ${
+								sender.provider
+							} campaing: ${campaign.name} , Error: ${err.message || err}`,
+							{
+								debug: true,
+								error: true,
+								er: err,
+							}
 						);
-						if (!receivedReplies && reply > 0) receivedReplies++;
+						return;
+					});
+				}
 
-						if (!emailsBounced && bounceEmail > 0) emailsBounced++;
-					} else {
-						const fetchOptions = {
-							bodies: ["HEADER"],
-						};
-						const inboxEmails = await imap.search(
-							[["HEADER", "In-Reply-To", messageId]],
-							fetchOptions
-						);
+				log(`filterCampaignAnalytics ${filterCampaignAnalytics.length}`, {
+					debug: true,
+				});
+				for (const campaignAnalytic of filterCampaignAnalytics) {
+					const messageId = campaignAnalytic.messageId;
+					let receivedReplies = campaignAnalytic.receivedReplies;
+					let emailsBounced = campaignAnalytic.emailsBounced;
+					if (!receivedReplies && !emailsBounced) {
+						if (sender.provider === "outlook") {
+							const { reply, bounceEmail } = await outlookReplies(
+								messageId,
+								sender,
+								receivedReplies,
+								emailsBounced
+							);
+							if (!receivedReplies && reply > 0) receivedReplies++;
 
-						// console.log(
-						// 	"reply-------------------------",
-						// 	inboxEmails,
-						// 	inboxEmails && inboxEmails[0]?.attributes.flags,
-						// 	inboxEmails &&
-						// 		inboxEmails[0]?.parts[0].body["x-failed-recipients"],
-
-						// 	messageId,
-						// 	sender.email
-						// );
-						if (
-							inboxEmails &&
-							inboxEmails[0]?.parts[0].body["x-failed-recipients"]?.length > 0
-						) {
-							if (!emailsBounced) emailsBounced++;
+							if (!emailsBounced && bounceEmail > 0) emailsBounced++;
 						} else {
-							if (inboxEmails.length) receivedReplies++;
-						}
-					}
+							if (!imap) {
+								log(`imap is null for sender: ${sender.email}`, {
+									debug: true,
+								});
+								return;
+							}
 
-					await Campaign.updateCampaignAnalytic(
-						{ _id: campaignAnalytic._id },
-						{ receivedReplies, emailsBounced }
-					);
+							if (imap) {
+								const fetchOptions = {
+									bodies: ["HEADER"],
+								};
+								const inboxEmails = await imap.search(
+									[["HEADER", "In-Reply-To", messageId]],
+									fetchOptions
+								);
+
+								// console.log(
+								// 	"reply-------------------------",
+								// 	inboxEmails,
+								// 	inboxEmails && inboxEmails[0]?.attributes.flags,
+								// 	inboxEmails &&
+								// 		inboxEmails[0]?.parts[0].body["x-failed-recipients"],
+
+								// 	messageId,
+								// 	sender.email
+								// );
+								log(`imap or google reply ---: ${inboxEmails}`, {
+									debug: true,
+									flags: inboxEmails && inboxEmails[0]?.attributes.flags,
+									failedRecipient:
+										inboxEmails &&
+										inboxEmails[0]?.parts[0].body["x-failed-recipients"],
+									sender: sender.email,
+									messageId: messageId,
+								});
+								if (
+									inboxEmails &&
+									inboxEmails[0]?.parts[0].body["x-failed-recipients"]?.length >
+										0
+								) {
+									if (!emailsBounced) emailsBounced++;
+								} else {
+									if (inboxEmails.length) receivedReplies++;
+								}
+							}
+						}
+
+						await Campaign.updateCampaignAnalytic(
+							{ _id: campaignAnalytic._id },
+							{ receivedReplies, emailsBounced }
+						);
+					}
+				}
+				if (imap && sender.provider !== "outlook") {
+					await imap.closeImap();
+					imap.endImap();
 				}
 			}
-			if (sender.provider !== "outlook") {
-				await imap.closeImap();
-				imap.endImap();
-			}
+		} catch (err) {
+			log(
+				`Sender Error: sender ${sender.email} , provider: ${
+					sender.provider
+				} campaing: ${campaign.name} , Error: ${err.message || err}`,
+				{
+					debug: true,
+					error: true,
+					er: err,
+				}
+			);
+			continue;
 		}
 	}
 }
@@ -141,11 +189,19 @@ async function outlookReplies(messageId, sender, reply, bounceEmail) {
 			const emails = response.value;
 			for (const email of emails) {
 				const message = parseOutlookMessage(email, folder);
-				console.log("message--------", message.inReplyTo, messageId);
+				log(`"message--------", ${message.inReplyTo}, ${messageId}`, {
+					debug: true,
+				});
 
 				if (message.inReplyTo === messageId) {
 					// console.log("message--------", message, message.inReplyTo, messageId);
 					const undeliverable = message.subject.split(":")[0];
+					log(
+						`"undeliverable--------", ${undeliverable} message.inReplyTo: ${message.inReplyTo}`,
+						{
+							debug: true,
+						}
+					);
 					if (undeliverable === "Undeliverable") {
 						bounceEmail++;
 					} else {
@@ -170,6 +226,7 @@ async function analyticExecutioner(campaign) {
 		log(`Campaign analytics execution Error: ${err?.message || err} `, {
 			error: true,
 			debug: true,
+			er: err,
 		});
 	}
 }

@@ -5,6 +5,7 @@
 	"license": "MIT",
 	"main": "src/index.js",
 	"scripts": {
+		"pre:dev": "NODE_ENV=pre-dev nodemon --exec babel-node src/index.js",
 		"dev": "nodemon --exec babel-node src/index.js",
 		"build": "babel src -d dist",
 		"serve": "node dist/index.js",
@@ -33,6 +34,7 @@
 	"dependencies": {
 		"@azure/msal-node": "^1.17.0",
 		"@microsoft/microsoft-graph-client": "^3.0.5",
+		"@sentry/node": "^7.57.0",
 		"axios": "^1.4.0",
 		"bull": "^4.10.4",
 		"express": "^4.18.1",

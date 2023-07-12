@@ -66,6 +66,7 @@ export const campaignAnalyticTestScript = async (
 		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
 			debug: true,
 			error,
+			er: error,
 		});
 	}
 };

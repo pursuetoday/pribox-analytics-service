@@ -17,6 +17,7 @@ async function processAnalyticExecution(campaign, done) {
 			campaignId: campaign._id,
 			error: true,
 			debug: true,
+			er: err,
 		});
 		return { err: errMessage };
 	}
@@ -37,7 +38,7 @@ async function analyticExecutionJob(job, done) {
 			`Campaign Analytic Execution Job: Exception ${
 				err?.message || err
 			} [id: ${campaignName}]`,
-			{ campaignId, campaignName, error: true }
+			{ campaignId, campaignName, error: true, debug: true, er: err }
 		);
 		return done(true, job);
 	}

@@ -22,11 +22,8 @@ async function processAnalyticScheduler() {
 	log(`campaign analytic scheduler init campaignsLength ${campaigns?.length}`);
 
 	for (const campaign of campaigns) {
-		const analyticEndDate = moment(campaign?.duration?.endingAt).add(
-			25,
-			"days"
-		);
-        
+		const analyticEndDate = moment(campaign?.duration?.endingAt).add(5, "days");
+
 		if (moment().isBefore(analyticEndDate)) {
 			const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
 			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
@@ -51,6 +48,7 @@ async function analyticScheduler() {
 		log(`Campaign Email scheduler Error: ${err?.message || err} `, {
 			error: true,
 			debug: true,
+			er: err,
 		});
 	}
 }

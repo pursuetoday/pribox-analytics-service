@@ -63,6 +63,8 @@ async function getProspects(campaign) {
 	} catch (err) {
 		log(`getProspects Error: ${err?.message || err}`, {
 			error: true,
+			debug: true,
+			er: err,
 		});
 	}
 }
