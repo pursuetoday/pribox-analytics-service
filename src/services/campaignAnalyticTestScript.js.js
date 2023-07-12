@@ -31,24 +31,34 @@ export const campaignAnalyticTestScript = async (
 		let openCount = 0;
 
 		for (const receiver of receivers) {
-			console.log(
-				"Count..................................",
-				openCount,
-				click,
-				open
-			);
-			let isOpen;
-			if (openCount < parseInt(open)) {
-				isOpen = true;
-				openCount++;
-			} else {
-				openCount++;
-				isOpen = false;
-			}
-			if (receiver?.provider === "outlook") {
-				await interactViaOutlook(receiver._id, sender, isClick);
-			} else {
-				await interactViaIMAP(receiver, sender, isClick);
+			try {
+				console.log(
+					"Count..................................",
+					openCount,
+					click,
+					open
+				);
+				let isOpen;
+				if (openCount < parseInt(open)) {
+					isOpen = true;
+					openCount++;
+				} else {
+					openCount++;
+					isOpen = false;
+				}
+				if (receiver?.provider === "outlook") {
+					await interactViaOutlook(receiver._id, sender, isOpen);
+				} else {
+					await interactViaIMAP(receiver, sender, isOpen);
+				}
+			} catch (err) {
+				console.log(
+					"err-------",
+					err.message,
+					receiver.provider,
+					receiver.email
+				);
+				continue;
 			}
 		}
 		return true;
@@ -64,8 +74,14 @@ async function interactViaIMAP(receiver, sender, isOpen = false) {
 		bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE)", "TEXT"],
 		markSeen: false,
 	};
+	console.log("-----------------------provider", receiver.provider);
+	const imap = await Imap.connect({ mailbox: receiver, fetchOptions }).catch(
+		(e) => {
+			console.log("e---", e.message, receiver.provider);
+			return;
+		}
+	);
 
-	const imap = await Imap.connect({ mailbox: receiver, fetchOptions });
 	const inboxFolder = await imap.getInboxFolder();
 	await imap.openFolder(inboxFolder.path);
 	const inboxEmails = await imap.search([["UNSEEN"], ["SINCE", new Date()]]);
@@ -132,10 +148,6 @@ async function interactViaOutlook(toMailbox, sender, isOpen = false) {
 		if (messageObj.sender.emailAddress.address === sender) {
 			const message = messageObj.body.content;
 
-			log(`Url for outlook:- ${url}`, {
-				debug: true,
-			});
-
 			if (!isOpen) {
 				const url = filterURL("a", "href", message);
 				if (url) {
@@ -146,6 +158,9 @@ async function interactViaOutlook(toMailbox, sender, isOpen = false) {
 						await clickOnLink(url);
 					}
 				}
+				log(`Url for outlook:- ${url}`, {
+					debug: true,
+				});
 			} else {
 				const url2 = filterURL("img", "src", message);
 				if (url2) await clickOnLink(url2);
