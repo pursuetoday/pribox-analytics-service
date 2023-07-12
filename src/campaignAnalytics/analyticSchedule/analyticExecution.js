@@ -189,11 +189,14 @@ async function outlookReplies(messageId, sender, reply, bounceEmail) {
 			const emails = response.value;
 			for (const email of emails) {
 				const message = parseOutlookMessage(email, folder);
-				log(`"message--------", ${message.inReplyTo}, ${messageId}`, {
-					debug: true,
-				});
+				log(
+					`"messageId--------", ${message?.inReplyTo} , ${message.from.email}, ${messageId}`,
+					{
+						debug: true,
+					}
+				);
 
-				if (message.inReplyTo === messageId) {
+				if (message?.inReplyTo === messageId) {
 					// console.log("message--------", message, message.inReplyTo, messageId);
 					const undeliverable = message.subject.split(":")[0];
 					log(
