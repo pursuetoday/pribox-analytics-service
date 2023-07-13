@@ -45,7 +45,7 @@ async function analyticScheduler() {
 	try {
 		await processAnalyticScheduler();
 	} catch (err) {
-		log(`Campaign Email scheduler Error: ${err?.message || err} `, {
+		log(`Campaign Analytics scheduler Error: ${err?.message || err} `, {
 			error: true,
 			debug: true,
 			er: err,

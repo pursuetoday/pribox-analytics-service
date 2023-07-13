@@ -3,7 +3,7 @@ import { serializeError } from "./error";
 import { shortenedEnvs } from "../constant";
 
 const SLACK_SERVICE_URL =
-	"https://hooks.slack.com/services/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";
+	"https://hooks.slack.com/services/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";
 
 export default async function slack(message, pretext, variant = "none", extra) {
 	try {
