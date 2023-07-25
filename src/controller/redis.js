@@ -1,4 +1,4 @@
-import { campaignAnalyticExecutionQueue } from "../campaignAnalytics/queues";
+import { campaignAnalyticExecutionQueue } from '../campaignAnalytics/queues';
 
 export const getAnalyticsRedisQueueCount = async (req, res, next) => {
 	try {

@@ -1,15 +1,12 @@
-import Campaign from "../campaign";
-import {
-	campaignAnalyticExecutionQueue,
-	campaignAnalyticExecutionTitle,
-} from "../queues";
-import { generateJobId } from "../../utils/jobId";
-import log from "../../utils/log";
-import moment from "moment";
+import moment from 'moment';
+import Campaign from '../campaign';
+import { campaignAnalyticExecutionQueue, campaignAnalyticExecutionTitle } from '../queues';
+import { generateJobId } from '../../utils/jobId';
+import log from '../../utils/log';
 
 async function processAnalyticScheduler() {
 	const query = {
-		status: { $nin: ["ready", "draft"] },
+		status: { $nin: ['ready', 'draft'] },
 		deletedAt: null,
 		// createdAt: {
 		// 	// 35 minutes ago (from now)
@@ -22,20 +19,16 @@ async function processAnalyticScheduler() {
 	log(`campaign analytic scheduler init campaignsLength ${campaigns?.length}`);
 
 	for (const campaign of campaigns) {
-		const analyticEndDate = moment(campaign?.duration?.endingAt).add(5, "days");
+		const analyticEndDate = moment(campaign?.duration?.endingAt).add(5, 'days');
 
 		if (moment().isBefore(analyticEndDate)) {
 			const jobId = generateJobId(campaignAnalyticExecutionTitle, campaign._id);
 			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
 			if (!currentJob) {
-				campaignAnalyticExecutionQueue.add(
-					campaignAnalyticExecutionTitle,
-					campaign,
-					{
-						// delay: 5000,
-						jobId,
-					}
-				);
+				campaignAnalyticExecutionQueue.add(campaignAnalyticExecutionTitle, campaign, {
+					// delay: 5000,
+					jobId,
+				});
 			}
 		}
 	}

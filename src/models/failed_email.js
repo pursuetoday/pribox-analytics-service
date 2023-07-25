@@ -6,34 +6,34 @@ const Schema = new mongoose.Schema(
 	{
 		to: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'mailbox'
+			ref: 'mailbox',
 		},
 		from: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'mailbox'
+			ref: 'mailbox',
 		},
 		template: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'email_template'
+			ref: 'email_template',
 		},
 		errorCode: {
 			type: String,
-			required: true
+			required: true,
 		},
 		deletedBy: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'user'
+			ref: 'user',
 		},
 		deletedAt: {
 			type: Date,
-			index: true
-		}
+			index: true,
+		},
 	},
 	{
 		timestamps: {
 			createdAt: 'createdAt',
-			updatedAt: 'updatedAt'
-		}
+			updatedAt: 'updatedAt',
+		},
 	}
 );
 
@@ -43,11 +43,11 @@ Schema.virtual('id').get(function () {
 });
 
 Schema.set('toObject', {
-	virtuals: true
+	virtuals: true,
 });
 
 Schema.set('toJSON', {
-	virtuals: true
+	virtuals: true,
 });
 
 export default mongoose.model('failed_email', Schema);

@@ -1,10 +1,10 @@
-import _ from "lodash";
-import CampaignModel from "../models/campaign";
-import SenderModel from "../models/mailbox";
-import CampaignAnalyticModel from "../models/campaign_analytic";
-import ProspectModel from "../models/prospect";
-import UnsubscribeEmailModel from "../models/unsubscribe_email";
-import log from "../utils/log";
+import _ from 'lodash';
+import CampaignModel from '../models/campaign';
+import SenderModel from '../models/mailbox';
+import CampaignAnalyticModel from '../models/campaign_analytic';
+import ProspectModel from '../models/prospect';
+import UnsubscribeEmailModel from '../models/unsubscribe_email';
+import log from '../utils/log';
 
 // DB methods to get data from mongo db
 async function getCampaign(campaignId) {
@@ -50,13 +50,8 @@ async function getProspects(campaign) {
 			deletedAt: { $exists: false },
 		});
 		if (excludeProspectList || unsubscribeEmails) {
-			const newExcludeProspect = excludeProspectList
-				.concat(unsubscribeEmails)
-				.map((e) => e.email);
-			prospectList = _.filter(
-				prospectList,
-				(p) => !newExcludeProspect.includes(p.email)
-			);
+			const newExcludeProspect = excludeProspectList.concat(unsubscribeEmails).map((e) => e.email);
+			prospectList = _.filter(prospectList, (p) => !newExcludeProspect.includes(p.email));
 		}
 
 		if (prospectList?.length > 0) return prospectList;
@@ -73,12 +68,8 @@ async function getProspects(campaign) {
 
 async function saveCampaignAnalytics(newData) {
 	try {
-		const options = { upsert: true, returnDocument: "after" };
-		const { value } = await CampaignAnalyticModel.findOneAndUpdate(
-			newData,
-			{ $set: {} },
-			options
-		);
+		const options = { upsert: true, returnDocument: 'after' };
+		const { value } = await CampaignAnalyticModel.findOneAndUpdate(newData, { $set: {} }, options);
 		return value;
 	} catch (error) {
 		console.error(error);
@@ -89,13 +80,10 @@ async function updateCampaignAnalytic(query, updateObj) {
 	// const {campaignId , prospectId , variantId} = query
 	// const {status} = updateObj
 	try {
-		const updateCampaignAnalytic = await CampaignAnalyticModel.updateOne(
-			query,
-			{
-				$set: updateObj,
-			}
-		);
-		return updateCampaignAnalytic;
+		const updateAnalytic = await CampaignAnalyticModel.updateOne(query, {
+			$set: updateObj,
+		});
+		return updateAnalytic;
 	} catch (error) {
 		console.error(error);
 	}

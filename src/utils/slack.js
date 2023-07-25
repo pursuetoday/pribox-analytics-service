@@ -1,49 +1,50 @@
-import axios from "axios";
-import { serializeError } from "./error";
-import { shortenedEnvs } from "../constant";
+import axios from 'axios';
+import { serializeError } from './error';
+import { shortenedEnvs } from '../constant';
 
 const SLACK_SERVICE_URL =
-	"https://hooks.slack.com/services/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";
+	'https://hooks.slack.com/services/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';
 
-export default async function slack(message, pretext, variant = "none", extra) {
+export default async function slack(message, pretext, variant = 'none', extra) {
 	try {
-		if (process.env.NODE_ENV === "pre-dev") {
+		if (process.env.NODE_ENV === 'dev-local') {
 			return console.log(
 				`${pretext}: ${parseMessage(message)}
-			${extra ? parseMessage(extra) : ""}`
+			${extra ? parseMessage(extra) : ''}`
 			);
 		}
 
 		const slackMessageBody = {
 			attachments: [
 				{
-					title: `Pribox.Analytic.Service [${
-						shortenedEnvs[process.env.NODE_ENV]
-					}] ${variant === "error" ? "ERROR" : ""}: ${pretext}`,
+					title: `Pribox.Analytic.Service [${shortenedEnvs[process.env.NODE_ENV]}] ${
+						variant === 'error' ? 'ERROR' : ''
+					}: ${pretext}`,
 					text: `${parseMessage(message)}
-					${extra ? parseMessage(extra) : ""}`,
+					${extra ? parseMessage(extra) : ''}`,
 					color: getColorFromVariant(variant),
 				},
 			],
 		};
 		await axios({
-			method: "POST",
+			method: 'POST',
 			url: SLACK_SERVICE_URL,
 			data: slackMessageBody,
-			headers: { "content-type": "application/json" },
+			headers: { 'content-type': 'application/json' },
 		});
 	} catch (e) {
-		console.log("slack error: ", e.message);
+		console.log('slack error: ', e.message);
 	}
 }
 
 function parseMessage(message) {
-	if (typeof message === "string") {
+	if (typeof message === 'string') {
 		return message;
 	}
 	if (message instanceof Error) {
 		return serializeError(message);
-	} else if (typeof message === "object") {
+	}
+	if (typeof message === 'object') {
 		return JSON.stringify(message, null, 4);
 	}
 	return message;
@@ -51,11 +52,11 @@ function parseMessage(message) {
 
 function getColorFromVariant(variant) {
 	switch (variant) {
-		case "none":
-			return "#5a29a7";
-		case "error":
-			return "#FF4842";
+		case 'none':
+			return '#5a29a7';
+		case 'error':
+			return '#FF4842';
 		default:
-			return "#439FE0";
+			return '#439FE0';
 	}
 }

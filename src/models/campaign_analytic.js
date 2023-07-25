@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const Schema = new mongoose.Schema(
 	{
 		campaignId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "campaigns",
+			ref: 'campaigns',
 			required: true,
 		},
 		executionStartDate: {
@@ -16,18 +16,18 @@ const Schema = new mongoose.Schema(
 		},
 		variantId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "campaign_flow.emailVariants",
+			ref: 'campaign_flow.emailVariants',
 		},
 		messageId: {
 			type: String,
 		},
 		prospectId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "prospect",
+			ref: 'prospect',
 		},
 		senderId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "mailbox",
+			ref: 'mailbox',
 		},
 		totalEmailsSent: {
 			type: Number,
@@ -45,7 +45,7 @@ const Schema = new mongoose.Schema(
 			type: Number,
 			default: 0,
 		},
-		//notreached = (total_prospects - (clicked+opened)/2) * 100 /total_propsects
+		// notreached = (total_prospects - (clicked+opened)/2) * 100 /total_propsects
 		receivedReplies: {
 			type: Number,
 			default: 0,
@@ -57,23 +57,23 @@ const Schema = new mongoose.Schema(
 	},
 	{
 		timestamps: {
-			createdAt: "createdAt",
-			updatedAt: "updatedAt",
+			createdAt: 'createdAt',
+			updatedAt: 'updatedAt',
 		},
 	}
 );
 
 // Duplicate the ID field.
-Schema.virtual("id").get(function () {
+Schema.virtual('id').get(function () {
 	return this._id.toHexString();
 });
 
-Schema.set("toObject", {
+Schema.set('toObject', {
 	virtuals: true,
 });
 
-Schema.set("toJSON", {
+Schema.set('toJSON', {
 	virtuals: true,
 });
 
-export default mongoose.model("campaign_analytic", Schema);
+export default mongoose.model('campaign_analytic', Schema);

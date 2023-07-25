@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const Schema = new mongoose.Schema(
 	{
@@ -7,13 +7,13 @@ const Schema = new mongoose.Schema(
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				index: true,
-				ref: "mailbox",
+				ref: 'mailbox',
 			},
 		],
 		status: {
 			type: String,
-			enum: ["draft", "ready", "active", "paused", "completed"],
-			default: "draft",
+			enum: ['draft', 'ready', 'active', 'paused', 'completed'],
+			default: 'draft',
 			index: true,
 		},
 		duration: {
@@ -23,27 +23,27 @@ const Schema = new mongoose.Schema(
 		},
 		selectedSchedule: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "campaign_schedules",
+			ref: 'campaign_schedules',
 		},
 		prospects: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "prospect_list",
+			ref: 'prospect_list',
 		},
 		excludeProspects: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "prospect_list",
+				ref: 'prospect_list',
 			},
 		],
 		sendTo: {
 			type: String,
-			enum: ["all", "first"],
-			default: "all",
+			enum: ['all', 'first'],
+			default: 'all',
 		},
 		missingVariableCase: {
 			type: String,
-			enum: ["send anyway", "send to checklist"],
-			default: "send to checklist",
+			enum: ['send anyway', 'send to checklist'],
+			default: 'send to checklist',
 		},
 		donotSendTo: {
 			unverified: Boolean,
@@ -63,36 +63,36 @@ const Schema = new mongoose.Schema(
 		},
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "user",
+			ref: 'user',
 		},
 		deletedBy: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "user",
+			ref: 'user',
 		},
 		deletedAt: Date,
 	},
 	{
 		timestamps: {
-			createdAt: "createdAt",
-			updatedAt: "updatedAt",
+			createdAt: 'createdAt',
+			updatedAt: 'updatedAt',
 		},
 	}
 );
 
 // Duplicate the ID field.
-Schema.virtual("id").get(function () {
+Schema.virtual('id').get(function () {
 	return this._id.toHexString();
 });
 
-Schema.set("toObject", {
+Schema.set('toObject', {
 	virtuals: true,
 });
 
-Schema.set("toJSON", {
+Schema.set('toJSON', {
 	virtuals: true,
 });
 
-Schema.index({ name: "text", status: "text" });
-Schema.set("autoIndex", true);
+Schema.index({ name: 'text', status: 'text' });
+Schema.set('autoIndex', true);
 
-export default mongoose.model("campaign", Schema);
+export default mongoose.model('campaign', Schema);

@@ -1,26 +1,26 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const Schema = new mongoose.Schema(
 	{
 		campaignId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "campaign",
+			ref: 'campaign',
 			required: true,
 		},
 		nodeItemId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "campaign_flow",
+			ref: 'campaign_flow',
 			required: true,
 		},
 		prospectId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "prospect",
+			ref: 'prospect',
 			required: true,
 			index: true,
 		},
 		senderId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "mailbox",
+			ref: 'mailbox',
 			required: true,
 		},
 		nodeItemRefData: {
@@ -29,34 +29,34 @@ const Schema = new mongoose.Schema(
 		},
 		stepType: {
 			type: String,
-			enum: ["start", "email", "trigger", "delay", "goal"],
+			enum: ['start', 'email', 'trigger', 'delay', 'goal'],
 		},
 		status: {
-			enum: ["active", "completed", "failed", "paused"],
-			default: "active",
+			enum: ['active', 'completed', 'failed', 'paused'],
+			default: 'active',
 			type: String,
 			required: true,
 		},
 	},
 	{
 		timestamps: {
-			createdAt: "createdAt",
-			updatedAt: "updatedAt",
+			createdAt: 'createdAt',
+			updatedAt: 'updatedAt',
 		},
 	}
 );
 
 // Duplicate the ID field.
-Schema.virtual("id").get(function () {
+Schema.virtual('id').get(function () {
 	return this._id.toHexString();
 });
 
-Schema.set("toObject", {
+Schema.set('toObject', {
 	virtuals: true,
 });
 
-Schema.set("toJSON", {
+Schema.set('toJSON', {
 	virtuals: true,
 });
 
-export default mongoose.model("campaign_simulation", Schema);
+export default mongoose.model('campaign_simulation', Schema);

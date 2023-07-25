@@ -1,10 +1,10 @@
 // import slack from "./slack";
-import * as Sentry from "@sentry/node";
+import * as Sentry from '@sentry/node';
 
 function log(message, params = {}) {
 	const transaction = Sentry.startTransaction({
-		op: "log file",
-		name: "capture error in log file for whole application",
+		op: 'log file',
+		name: 'capture error in log file for whole application',
 	});
 
 	try {
@@ -14,17 +14,17 @@ function log(message, params = {}) {
 		const data = JSON.stringify(restParams);
 		consoleLog(message, data);
 
-		if (debug && process.env.NODE_ENV !== "pre-dev") {
-			const variant = error ? "error" : "none";
+		if (debug && process.env.NODE_ENV !== 'dev-local') {
+			const variant = error ? 'error' : 'none';
 			// slack(message, data, variant);
 		}
 		if (error) {
 			Sentry.captureException(er);
 			transaction.finish();
 		}
-	} catch (error) {
+	} catch (err) {
 		Sentry.captureException(err);
-		console.log("Error in log fn:", err);
+		console.log('Error in log fn:', err);
 	} finally {
 		transaction.finish();
 	}

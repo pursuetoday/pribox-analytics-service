@@ -1,5 +1,5 @@
-import { simpleParser } from "mailparser";
-import log from "./log";
+import { simpleParser } from 'mailparser';
+import log from './log';
 
 const parserOptions = {
 	skipHtmlToText: true,
@@ -8,15 +8,12 @@ const parserOptions = {
 };
 
 export async function parseEmail(email, label) {
-	const source =
-		"Imap-Id: " +
-		email.attributes.uid +
-		"\r\n" +
-		email.parts.find((part) => part.which === "")?.body;
+	const source = `Imap-Id: ${email.attributes.uid}\r\n${
+		email.parts.find((part) => part.which === '')?.body
+	}`;
 
 	const parsedEmail = await simpleParser(source, parserOptions);
-	const { to, from, subject, messageId, inReplyTo, date, html, text } =
-		parsedEmail;
+	const { to, from, subject, messageId, inReplyTo, date, html, text } = parsedEmail;
 
 	return {
 		to:
@@ -37,9 +34,9 @@ export async function parseEmail(email, label) {
 		body: html || text,
 		labels: [label],
 		tags: email.attributes.flags.map((item) =>
-			item.replace("\\", "").replace("$", "").toLowerCase()
+			item.replace('\\', '').replace('$', '').toLowerCase()
 		),
-		isSpam: ["spam", "junk", "bulk mail"].includes(label.toLowerCase()),
+		isSpam: ['spam', 'junk', 'bulk mail'].includes(label.toLowerCase()),
 		date,
 	};
 }
@@ -49,9 +46,7 @@ export function parseOutlookMessage(email, folder) {
 	try {
 		const inReplyToHeader =
 			email.internetMessageHeaders &&
-			email.internetMessageHeaders.find(
-				(header) => header.name === "In-Reply-To"
-			);
+			email.internetMessageHeaders.find((header) => header.name === 'In-Reply-To');
 
 		const message = {
 			id: email.id,
@@ -69,11 +64,11 @@ export function parseOutlookMessage(email, folder) {
 			body: email.body.content,
 			date: email.createdDateTime,
 			labels: [folder.toLowerCase()],
-			isSpam: folder === "Junk Email",
+			isSpam: folder === 'Junk Email',
 		};
 
 		return message;
-	} catch (error) {
+	} catch (err) {
 		log(`Error parseOutlookMessage: ${err.message || err}`, {
 			debug: true,
 			error: true,

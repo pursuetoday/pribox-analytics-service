@@ -1,10 +1,10 @@
-import log from "../../utils/log";
-import analyticExecutioner from "../analyticSchedule/analyticExecution";
+import log from '../../utils/log';
+import analyticExecutioner from '../analyticSchedule/analyticExecution';
 // import moment from "moment";
 
-async function processAnalyticExecution(campaign, done) {
+async function processAnalyticExecution(campaign) {
 	try {
-		log("campaign analytic Execution Job starts", {
+		log('campaign analytic Execution Job starts', {
 			campaignName: campaign?.name,
 		});
 
@@ -35,12 +35,13 @@ async function analyticExecutionJob(job, done) {
 		const campaignId = campaign?._id;
 		const campaignName = campaign?.name;
 
-		log(
-			`Campaign Analytic Execution Job: Exception ${
-				err?.message || err
-			} [id: ${campaignName}]`,
-			{ campaignId, campaignName, error: true, debug: true, er: err }
-		);
+		log(`Campaign Analytic Execution Job: Exception ${err?.message || err} [id: ${campaignName}]`, {
+			campaignId,
+			campaignName,
+			error: true,
+			debug: true,
+			er: err,
+		});
 		return done(true, job);
 	}
 }

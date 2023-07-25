@@ -1,8 +1,8 @@
-import express from "express";
-import jobScheduler from "./campaignAnalytics/jobScheduler";
-import connectDatabase from "./connections/database";
-import * as Sentry from "@sentry/node";
-import { SENTRY_ENV, SENTRY_DNS } from "./config";
+import express from 'express';
+import * as Sentry from '@sentry/node';
+import jobScheduler from './campaignAnalytics/jobScheduler';
+import connectDatabase from './connections/database';
+import { SENTRY_ENV, SENTRY_DNS } from './config';
 
 const app = express();
 
@@ -44,7 +44,7 @@ app.use(Sentry.Handlers.errorHandler());
 
 try {
 	jobScheduler();
-	console.log("job-----");
+	console.log('job-----');
 	// campaignStepScheduler()
 } catch (e) {
 	console.log(e.message);

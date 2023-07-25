@@ -1,14 +1,13 @@
-import "isomorphic-fetch";
-import { ConfidentialClientApplication } from "@azure/msal-node";
-import { Client } from "@microsoft/microsoft-graph-client";
-import MailboxModel from "../models/mailbox";
-import { OUTLOOK_CREDS } from "../config";
+import 'isomorphic-fetch';
+import { ConfidentialClientApplication } from '@azure/msal-node';
+import { Client } from '@microsoft/microsoft-graph-client';
+import MailboxModel from '../models/mailbox';
+import { OUTLOOK_CREDS } from '../config';
 
 function getRefreshToken(oAuthClient) {
 	const tokenCache = oAuthClient.getTokenCache().serialize();
 	const refreshTokenObject = JSON.parse(tokenCache).RefreshToken;
-	const refreshToken =
-		refreshTokenObject[Object.keys(refreshTokenObject)[0]]?.secret;
+	const refreshToken = refreshTokenObject[Object.keys(refreshTokenObject)[0]]?.secret;
 	return refreshToken;
 }
 
@@ -21,8 +20,7 @@ class AuthProvider {
 		let mailbox;
 		mailbox = await MailboxModel.findOne({ _id: this.mailboxId });
 
-		const isAboutToExpire =
-			new Date(mailbox.social.expiresAt).getTime() < Date.now();
+		const isAboutToExpire = new Date(mailbox.social.expiresAt).getTime() < Date.now();
 
 		if (isAboutToExpire) {
 			const oAuthClient = getOAuth2Client();
@@ -36,10 +34,9 @@ class AuthProvider {
 				{ _id: this.mailboxId },
 				{
 					$set: {
-						"social.accessToken": res.accessToken,
-						"social.expiresAt": res.expiresOn,
-						"social.refreshToken":
-							newRefreshToken || mailbox.social.refreshToken,
+						'social.accessToken': res.accessToken,
+						'social.expiresAt': res.expiresOn,
+						'social.refreshToken': newRefreshToken || mailbox.social.refreshToken,
 					},
 				}
 			).catch(() => {});

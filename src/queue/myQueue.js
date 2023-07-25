@@ -1,11 +1,11 @@
-import _ from "lodash";
-import Queue from "bull";
-import { REDIS_CONFIG } from "../config";
+import Queue from 'bull';
+import { REDIS_CONFIG } from '../config';
 
-const prefixTitle = "pribox-analytic-service";
+const prefixTitle = 'pribox-analytic-service';
 
 export default class MyQueue {
 	queue;
+
 	queueTitle;
 
 	constructor(queueTitle) {
@@ -32,34 +32,31 @@ export default class MyQueue {
 			},
 		});
 	}
+
 	process(jobFunc) {
 		this.queue.process(this.queueTitle, jobFunc);
 
-		this.queue.on("error", (error) => {
-			console.error("error: ", error);
+		this.queue.on('error', (error) => {
+			console.error('error: ', error);
 		});
 
-		this.queue.on("stalled", (job = {}) => {
+		this.queue.on('stalled', (job = {}) => {
 			console.warn(`${this.baseMessage(job)} stalled`);
 		});
 
-		this.queue.on("failed", async (job = {}, err = {}) => {
-			console.error(
-				`${this.baseMessage(job)} failed with error => ${JSON.stringify(
-					err.id
-				)}`
-			);
+		this.queue.on('failed', async (job = {}, err = {}) => {
+			console.error(`${this.baseMessage(job)} failed with error => ${JSON.stringify(err.id)}`);
 		});
 
-		this.queue.on("resumed", (job) => {
+		this.queue.on('resumed', (job) => {
 			console.log(`${this.baseMessage(job)} resumed`);
 		});
 
-		this.queue.on("drained", () => {
+		this.queue.on('drained', () => {
 			console.log(`${this.queueTitle} Queue drained!`);
 		});
 
-		this.queue.on("completed", async (job, result) => {
+		this.queue.on('completed', async (job, result) => {
 			console.log(`${this.baseMessage(job)} completed!`);
 		});
 		return this.queue;
