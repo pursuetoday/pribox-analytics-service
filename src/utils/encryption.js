@@ -10,7 +10,7 @@ function encrypt(str) {
 	const encrypted = Buffer.concat([cipher.update(str), cipher.final()]);
 	return {
 		iv: iv.toString('hex'),
-		content: encrypted.toString('hex')
+		content: encrypted.toString('hex'),
 	};
 }
 
@@ -22,7 +22,7 @@ function decrypt(encrypted) {
 	);
 	return Buffer.concat([
 		decipher.update(Buffer.from(encrypted.content, 'hex')),
-		decipher.final()
+		decipher.final(),
 	]).toString();
 }
 

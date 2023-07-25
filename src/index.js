@@ -1,8 +1,8 @@
-import app from "./app";
-import routes from "./routes";
-import { env, port } from "./config";
+import app from './app';
+import routes from './routes';
+import { env, port } from './config';
 
-app.use("/api", routes);
+app.use('/api', routes);
 
 app.listen(port, () => {
 	console.info(`server started on port ${port} (${env})`); // eslint-disable-line no-console

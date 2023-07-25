@@ -68,21 +68,20 @@ export function getIMAPConfig(args, decrypt = true) {
 				password: decrypt ? getDecryptedPassword(args[type].password) : args[type].password,
 				authTimeout,
 				tls: args[type].security === 'ssl/tls',
-				tlsOptions: { servername: args[type].host, rejectUnauthorized: false }
+				tlsOptions: { servername: args[type].host, rejectUnauthorized: false },
 			};
 		case 'outlook':
-			const auth2 = base64("user=" + args.email + "^Aauth=Bearer " + args.social.accessToken + "^A^A");
-			return{
-
+			const auth2 = base64(`user=${args.email}^Aauth=Bearer ${args.social.accessToken}^A^A`);
+			return {
 				port: providerObj[type].port,
 				host: providerObj[type].host,
-				xoauth2 : auth2,
+				xoauth2: auth2,
 				authTimeout,
 				tls: true,
 				tlsOptions: {
 					servername: providerObj[type].host,
-					rejectUnauthorized: false
-				}
+					rejectUnauthorized: false,
+				},
 			};
 		default:
 			return {
@@ -94,12 +93,10 @@ export function getIMAPConfig(args, decrypt = true) {
 				tls: true,
 				tlsOptions: {
 					servername: providerObj[type].host,
-					rejectUnauthorized: false
-				}
+					rejectUnauthorized: false,
+				},
 			};
 	}
 }
 
-export const base64 = (data) => {
-   return Buffer.from(data).toString('base64');
-}
+export const base64 = (data) => Buffer.from(data).toString('base64');

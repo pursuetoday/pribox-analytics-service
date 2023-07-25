@@ -4,50 +4,50 @@ const Schema = new mongoose.Schema(
 	{
 		to: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'mailbox'
+			ref: 'mailbox',
 		},
 		from: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'mailbox'
+			ref: 'mailbox',
 		},
 		date: {
 			type: Date,
-			required: true
+			required: true,
 		},
 		template: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'email_template'
+			ref: 'email_template',
 		},
 		messageId: {
-			type: String
+			type: String,
 		},
 		isReply: {
-			type: Boolean
+			type: Boolean,
 		},
 		inReplyTo: {
-			type: String
+			type: String,
 		},
 		hasInteracted: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		interactionTime: {
-			type: Date
+			type: Date,
 		},
 		deletedBy: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'user'
+			ref: 'user',
 		},
 		deletedAt: {
 			type: Date,
-			index: true
-		}
+			index: true,
+		},
 	},
 	{
 		timestamps: {
 			createdAt: 'createdAt',
-			updatedAt: 'updatedAt'
-		}
+			updatedAt: 'updatedAt',
+		},
 	}
 );
 
@@ -57,11 +57,11 @@ Schema.virtual('id').get(function () {
 });
 
 Schema.set('toObject', {
-	virtuals: true
+	virtuals: true,
 });
 
 Schema.set('toJSON', {
-	virtuals: true
+	virtuals: true,
 });
 
 export default mongoose.model('sent_email', Schema);

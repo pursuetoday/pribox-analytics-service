@@ -1,6 +1,6 @@
-import CampaignModel from "../models/campaign";
-import SenderModel from "../models/mailbox";
-import CampaignAnalyticModel from "../models/campaign_analytic";
+import CampaignModel from '../models/campaign';
+import SenderModel from '../models/mailbox';
+import CampaignAnalyticModel from '../models/campaign_analytic';
 
 export class Campaign {
 	// DB methods to get data from mongo db
@@ -25,7 +25,7 @@ export class Campaign {
 
 	static async saveCampaignAnalytics(newData) {
 		try {
-			const options = { upsert: true, returnDocument: "after" };
+			const options = { upsert: true, returnDocument: 'after' };
 			const { value } = await CampaignAnalyticModel.findOneAndUpdate(
 				newData,
 				{ $set: {} },
@@ -41,12 +41,9 @@ export class Campaign {
 		// const {campaignId , prospectId , variantId} = query
 		// const {status} = updateObj
 		try {
-			const updateCampaignAnalytic = await CampaignAnalyticModel.updateOne(
-				query,
-				{
-					$set: updateObj,
-				}
-			);
+			const updateCampaignAnalytic = await CampaignAnalyticModel.updateOne(query, {
+				$set: updateObj,
+			});
 			return updateCampaignAnalytic;
 		} catch (error) {
 			console.error(error);
