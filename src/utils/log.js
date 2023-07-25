@@ -1,4 +1,4 @@
-import slack from "./slack";
+// import slack from "./slack";
 import * as Sentry from '@sentry/node';
 
 function log(message, params = {}) {
@@ -16,7 +16,7 @@ function log(message, params = {}) {
 
 		if (debug && process.env.NODE_ENV !== 'dev-local') {
 			const variant = error ? 'error' : 'none';
-			slack(message, data, variant);
+			// slack(message, data, variant);
 		}
 		if (error) {
 			Sentry.captureException(er);

@@ -47,6 +47,6 @@ export const OUTLOOK_CREDS = {
 
 export const SENTRY_DNS =
 	process.env.SENTRY_DNS ||
-	'https://347c90b09c794bac95d9536042f72f24@o4505516274941952.ingest.sentry.io/4505516355158016';
+	'https://2f4702e16d7b4fc18d37e295fc2edb6d@o4505550487879680.ingest.sentry.io/4505589630763008';
 
 export const SENTRY_ENV = process.env.NODE_ENV;
