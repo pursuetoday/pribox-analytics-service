@@ -23,7 +23,7 @@ jobs:
             - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
               name: Azure login
               with:
-                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                client-id: ${{ secrets.AZURE_CLIENT_ID_STAGING }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - name: Build and push image to ACR
@@ -41,7 +41,7 @@ jobs:
             - uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2
               name: Azure login
               with:
-                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                client-id: ${{ secrets.AZURE_CLIENT_ID_STAGING }}
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - uses: azure/use-kubelogin@v1
