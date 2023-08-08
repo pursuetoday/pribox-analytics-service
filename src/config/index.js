@@ -1,3 +1,15 @@
+import dotenv from 'dotenv';
+import { shortenedEnvs } from '../constant';
+
+export const isProd = process.env.NODE_ENV === 'production';
+export const isStaging = process.env.NODE_ENV === 'staging';
+export const isDevLive = process.env.NODE_ENV === 'development';
+export const local = process.env.NODE_ENV === 'dev-local';
+
+dotenv.config(
+	(!isProd || !isDevLive || !local) && { path: `.env.${shortenedEnvs[process.env.NODE_ENV]}` }
+);
+
 export const port = process.env.PORT || 5003;
 export const env = process.env.NODE_ENV || 'development';
 
