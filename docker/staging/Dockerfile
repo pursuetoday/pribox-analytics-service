@@ -24,4 +24,4 @@ RUN yarn build
 EXPOSE 5003
 
 # Run this command when a container is created from this image
-CMD ["yarn", "run", "start:prod"]
+CMD ["yarn", "run", "start:staging"]
