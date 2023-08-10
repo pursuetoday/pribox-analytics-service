@@ -16,7 +16,10 @@ async function processAnalyticExecutioner(campaign) {
 		return;
 	}
 
-	log(`campaign analytic Execution startExecution for campaign ${campaign.name}`, { debug: true });
+	log(
+		`campaign analytic start Execution for campaign ${campaign.name} , sendersLength: ${senders}`,
+		{ debug: true }
+	);
 
 	for (const sender of senders) {
 		// console.log(
@@ -51,8 +54,7 @@ async function processAnalyticExecutioner(campaign) {
 				});
 				for (const campaignAnalytic of filterCampaignAnalytics) {
 					const { messageId } = campaignAnalytic;
-					let { receivedReplies } = campaignAnalytic;
-					let { emailsBounced } = campaignAnalytic;
+					let { receivedReplies , emailsBounced } = campaignAnalytic;
 					if (!receivedReplies && !emailsBounced) {
 						if (sender.provider === 'outlook') {
 							const { reply, bounceEmail } = await outlookReplies(
@@ -81,16 +83,6 @@ async function processAnalyticExecutioner(campaign) {
 									fetchOptions
 								);
 
-								// console.log(
-								// 	"reply-------------------------",
-								// 	inboxEmails,
-								// 	inboxEmails && inboxEmails[0]?.attributes.flags,
-								// 	inboxEmails &&
-								// 		inboxEmails[0]?.parts[0].body["x-failed-recipients"],
-
-								// 	messageId,
-								// 	sender.email
-								// );
 								log(`imap or google reply ---: ${inboxEmails}`, {
 									debug: true,
 									flags: inboxEmails && inboxEmails[0]?.attributes.flags,
