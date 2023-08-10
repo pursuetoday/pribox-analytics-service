@@ -1,7 +1,6 @@
 import emailProvidersConfig from '../constant/emailProviders';
 import { getDecryptedPassword } from '../utils/encryption';
 
-
 export function getIMAPConfig(args, decrypt = true) {
 	const providerObj = emailProvidersConfig[args.provider];
 	const type = 'imap';

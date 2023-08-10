@@ -6,6 +6,7 @@ async function processAnalyticExecution(campaign) {
 	try {
 		log('campaign analytic Execution Job starts', {
 			campaignName: campaign?.name,
+			debug: true
 		});
 
 		await analyticExecutioner(campaign);

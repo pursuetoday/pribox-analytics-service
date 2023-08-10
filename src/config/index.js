@@ -62,3 +62,7 @@ export const SENTRY_DNS =
 	'https://2f4702e16d7b4fc18d37e295fc2edb6d@o4505550487879680.ingest.sentry.io/4505589630763008';
 
 export const SENTRY_ENV = process.env.NODE_ENV;
+
+export const SLACK_SERVICE_URL =
+	process.env.SLACK_SERVICE_URL ||
+	'https://hooks.slack.com/services/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';

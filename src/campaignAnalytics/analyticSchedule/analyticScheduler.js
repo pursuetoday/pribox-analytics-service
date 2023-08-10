@@ -16,9 +16,9 @@ async function processAnalyticScheduler() {
 
 	const campaigns = await Campaign.getCampaigns(query, { createdAt: -1 });
 
-	log(`campaign analytic scheduler init campaignsLength ${campaigns?.length}`);
+	log(`campaign analytic scheduler init campaignsLength ${campaigns?.length}`, { debug: true });
 
-	for (const campaign of campaigns) {
+	campaigns.forEach(async (campaign, i) => {
 		const analyticEndDate = moment(campaign?.duration?.endingAt).add(5, 'days');
 
 		if (moment().isBefore(analyticEndDate)) {
@@ -26,12 +26,12 @@ async function processAnalyticScheduler() {
 			const currentJob = await campaignAnalyticExecutionQueue.getJob(jobId);
 			if (!currentJob) {
 				campaignAnalyticExecutionQueue.add(campaignAnalyticExecutionTitle, campaign, {
-					// delay: 5000,
+					delay: 300 * i,
 					jobId,
 				});
 			}
 		}
-	}
+	});
 }
 
 async function analyticScheduler() {
