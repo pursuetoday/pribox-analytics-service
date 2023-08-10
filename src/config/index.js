@@ -65,4 +65,4 @@ export const SENTRY_ENV = process.env.NODE_ENV;
 
 export const SLACK_SERVICE_URL =
 	process.env.SLACK_SERVICE_URL ||
-	'https://hooks.slack.com/services/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';
+	'https://hooks.slack.com/services/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';
