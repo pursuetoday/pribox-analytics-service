@@ -5,6 +5,7 @@ import Campaign from '../campaign';
 import Imap from '../../core/imap';
 import { msInHour } from '../../constant/timeConstant';
 import log from '../../utils/log';
+import moment from 'moment';
 
 async function processAnalyticExecutioner(campaign) {
 	const senders = await Campaign.getSenders(campaign.sender);
@@ -54,7 +55,7 @@ async function processAnalyticExecutioner(campaign) {
 				});
 				for (const campaignAnalytic of filterCampaignAnalytics) {
 					const { messageId } = campaignAnalytic;
-					let { receivedReplies , emailsBounced } = campaignAnalytic;
+					let { receivedReplies, emailsBounced } = campaignAnalytic;
 					if (!receivedReplies && !emailsBounced) {
 						if (sender.provider === 'outlook') {
 							const { reply, bounceEmail } = await outlookReplies(
@@ -197,8 +198,11 @@ async function outlookReplies(messageId, sender, reply, bounceEmail) {
 
 async function analyticExecutioner(campaign) {
 	try {
+		const analyticEndDate = moment(campaign?.duration?.endingAt).add(5, 'days');
 		log('execution start------------');
-		await processAnalyticExecutioner(campaign);
+		if (moment().isBefore(analyticEndDate)) {
+			await processAnalyticExecutioner(campaign);
+		}
 	} catch (err) {
 		log(`Campaign analytics execution Error: ${err?.message || err} `, {
 			error: true,

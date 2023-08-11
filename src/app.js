@@ -44,7 +44,6 @@ app.use(Sentry.Handlers.errorHandler());
 
 try {
 	jobScheduler();
-	console.log('job-----');
 	// campaignStepScheduler()
 } catch (e) {
 	console.log(e.message);
