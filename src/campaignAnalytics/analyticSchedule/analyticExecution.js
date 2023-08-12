@@ -84,11 +84,11 @@ async function processAnalyticExecutioner(campaign) {
 									fetchOptions
 								);
 
-								log(`imap or google reply ---: ${inboxEmails}`, {
+								log(`imap or google reply ---inboxEmails: ${inboxEmails}`, {
 									debug: true,
-									flags: inboxEmails && inboxEmails[0]?.attributes.flags,
+									flags: inboxEmails && inboxEmails[0]?.attributes.flags || "",
 									failedRecipient:
-										inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients'],
+										inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients'] || "",
 									sender: sender.email,
 									messageId,
 								});
