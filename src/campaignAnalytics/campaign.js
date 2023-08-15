@@ -17,6 +17,68 @@ async function getCampaigns(query, sort) {
 	return campaigns;
 }
 
+async function getSendersByCampaignsGroup() {
+	const currentTimeStamp = new Date();
+	const result = await CampaignModel.aggregate([
+		{
+			$match: {
+				status: { $nin: ['ready', 'draft'] },
+				deletedAt: null,
+			},
+		},
+		{
+			$addFields: {
+				endDatePlus5Days: {
+					$add: ['$duration.endingAt', 5 * 24 * 60 * 60 * 1000],
+				},
+			},
+		},
+		{
+			$match: {
+				'duration.startingAt': { $lte: currentTimeStamp },
+				endDatePlus5Days: { $gte: currentTimeStamp },
+			},
+		},
+		{
+			$lookup: {
+				from: 'mailboxes',
+				let: { sid: '$sender' },
+				pipeline: [
+					{
+						$match: {
+							$expr: { $in: ['$_id', '$$sid'] },
+							status: 'active',
+						},
+					},
+				],
+				as: 'senders',
+			},
+		},
+		{
+			$match: {
+				senders: { $exists: true, $type: 'array', $ne: [] },
+			},
+		},
+		{ $unwind: '$senders' },
+		{
+			$group: {
+				_id: '$senders._id',
+				sender: { $first: '$senders' },
+				campaigns: { $addToSet: '$$ROOT' },
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				sender: 1,
+				campaigns: 1,
+			},
+		},
+	]);
+
+	return result;
+}
+
 async function getSendersByEmails(senderEmails) {
 	return await SenderModel.find({
 		email: { $in: [...senderEmails] },
@@ -101,6 +163,7 @@ async function getCampaignAnalytic(query, populate = null) {
 export default {
 	getCampaign,
 	getCampaigns,
+	getSendersByCampaignsGroup,
 	getSenders,
 	getProspects,
 	getSendersByEmails,
