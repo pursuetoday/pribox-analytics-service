@@ -53,6 +53,7 @@
 		"mailparser": "^3.6.4",
 		"moment": "^2.29.4",
 		"mongoose": "^7.0.3",
+		"node-cache": "^5.1.2",
 		"node-cron": "^3.0.2",
 		"nodemailer": "^6.9.1",
 		"promise-limit": "^2.7.0"
