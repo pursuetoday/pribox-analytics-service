@@ -7,7 +7,7 @@ WORKDIR /src
 # Copy package json and install dependencies
 ADD package.json .
 
-# # install yarn 
+# # install yarn
 # RUN npm install --global yarn
 
 # Install (local) NPM and Bower packages/dependencies

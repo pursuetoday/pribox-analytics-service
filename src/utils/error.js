@@ -1,7 +1,3 @@
-export function serializeError(obj) {
-	return JSON.stringify(obj, errorJsonReplacer, 4);
-}
-
 function errorJsonReplacer(_, value) {
 	if (value instanceof Error) {
 		return {
@@ -12,6 +8,9 @@ function errorJsonReplacer(_, value) {
 		};
 	}
 	return value;
+}
+export function serializeError(obj) {
+	return JSON.stringify(obj, errorJsonReplacer, 4);
 }
 
 export function parseError(obj) {
