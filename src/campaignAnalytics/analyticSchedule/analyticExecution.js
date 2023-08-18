@@ -90,7 +90,7 @@ async function imapReplies(campaignAnalytics, sender, campaign) {
 
 	for (const campaignAnalytic of campaignAnalytics) {
 		const { messageId } = campaignAnalytic;
-		let { receivedReplies, emailsBounced } = campaignAnalytic;
+		const { receivedReplies, emailsBounced } = campaignAnalytic;
 		if (!receivedReplies && !emailsBounced) {
 			if (!imap) {
 				log(`imap is null for sender: ${sender.email}`, {
@@ -135,7 +135,7 @@ async function outlookReplies(campaignAnalytics, sender, campaign) {
 	const client = getOutlookApiClient(sender._id);
 	for (const campaignAnalytic of campaignAnalytics) {
 		const { messageId } = campaignAnalytic;
-		let { receivedReplies, emailsBounced } = campaignAnalytic;
+		const { receivedReplies, emailsBounced } = campaignAnalytic;
 		if (!receivedReplies && !emailsBounced) {
 			// const data = [];
 			// console.log("////" , folder , messageId);

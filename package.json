@@ -12,7 +12,7 @@
 		"serve": "node dist/index.js",
 		"start:dev": "NODE_ENV=development yarn build && NODE_ENV=development yarn serve",
 		"start:staging": "NODE_ENV=staging yarn build && NODE_ENV=staging yarn serve",
-		"start:prod": "NODE_ENV=production yarn build && NODE_ENV=production yarn serve",
+		"start": "NODE_ENV=production yarn build && NODE_ENV=production yarn serve",
 		"lint": "eslint . --ext .js",
 		"lint:fix": "eslint --fix . --ext .js",
 		"prettier": "prettier --check src/**/*.js",
