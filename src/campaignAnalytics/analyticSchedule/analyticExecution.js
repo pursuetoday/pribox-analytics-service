@@ -7,121 +7,8 @@ import { msInHour } from '../../constant/timeConstant';
 import log from '../../utils/log';
 import { getCacheData, setCacheData } from '../../utils/nodeCache';
 
-async function processAnalyticExecutioner(senderObj) {
-	const { sender, campaigns } = senderObj;
-	if (!sender || campaigns?.length < 1) throw new Error('sender or campaign list not available');
-
-	log(
-		`campaign analytic start Execution for campaign length ${campaigns?.length} , sender email: ${sender.email}`,
-		{ debug: true }
-	);
-
-	const currentCampaignIndex = getCacheData(String(sender?._id)) || 0;
-	let campaign;
-	if (campaigns?.length === 1) {
-		campaign = campaigns[0];
-	} else {
-		campaign = campaigns[currentCampaignIndex];
-		setCacheData(String(sender._id), (currentCampaignIndex + 1) % campaigns.length, 18000);
-	}
-
-	if (!campaign) return;
-
-	const query = { campaignId: campaign._id, senderId: sender._id };
-
-	const campaignAnalytics = await Campaign.getCampaignAnalytic(query);
-	if (!campaignAnalytics?.length) return;
-
-	// console.log(
-	// 	'campaignAnalytics-------------------',
-	// 	currentCampaignIndex,
-	// 	campaign.name,
-	// 	sender.email,
-	// 	campaignAnalytics.length,
-	// 	campaignAnalytics[0]
-	// );
-	try {
-		if (sender.provider === 'outlook') {
-			await outlookReplies(campaignAnalytics, sender, campaign);
-		} else {
-			await imapReplies(campaignAnalytics, sender, campaign);
-		}
-	} catch (err) {
-		log(`processAnalyticExecutioner Error: ${err?.message || err} sender: ${sender.email} `, {
-			error: true,
-			debug: true,
-			er: err,
-		});
-	}
-}
-
 async function updateCampaignAnalytic(id, receivedReplies = 0, emailsBounced = 0) {
 	await Campaign.updateCampaignAnalytic({ _id: id }, { receivedReplies, emailsBounced });
-}
-
-async function imapConnection(sender) {
-	try {
-		const imap = await Imap.connect({ mailbox: sender });
-		imap.connection.on('error', (e) => {
-			console.log('connection error', e);
-		});
-		const inboxFolder = await imap.getInboxFolder();
-		console.log('inboxFolder----', inboxFolder);
-		await imap.openFolder(inboxFolder.path);
-		return imap;
-	} catch (e) {
-		console.log('connection error', e);
-	}
-}
-
-async function imapReplies(campaignAnalytics, sender, campaign) {
-	const imap = await imapConnection(sender).catch((err) => {
-		log(
-			`Imap Error: sender ${sender.email} , provider: ${sender.provider} campaing: ${
-				campaign.name
-			} , Error: ${err.message || err}`,
-			{
-				debug: true,
-				error: true,
-				er: err,
-			}
-		);
-	});
-
-	for (const campaignAnalytic of campaignAnalytics) {
-		const { messageId } = campaignAnalytic;
-		const { receivedReplies, emailsBounced } = campaignAnalytic;
-		if (!receivedReplies && !emailsBounced) {
-			if (!imap) {
-				log(`imap is null for sender: ${sender.email}`, {
-					debug: true,
-				});
-				return;
-			}
-			const fetchOptions = {
-				bodies: ['HEADER'],
-			};
-			const inboxEmails = await imap.search([['HEADER', 'In-Reply-To', messageId]], fetchOptions);
-
-			log(`imap or google reply ---inboxEmails: ${inboxEmails}`, {
-				debug: true,
-				flags: (inboxEmails && inboxEmails[0]?.attributes.flags) || '',
-				failedRecipient:
-					(inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients']) || '',
-				sender: sender.email,
-				messageId,
-			});
-			if (inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients']?.length > 0) {
-				if (!emailsBounced) await updateCampaignAnalytic(campaignAnalytic._id, 0, 1);
-			} else if (inboxEmails.length) {
-				console.log('inboxEmails.length', inboxEmails.length);
-				if (!receivedReplies) await updateCampaignAnalytic(campaignAnalytic._id, 1, 0);
-			}
-		}
-	}
-
-	await imap.closeImap();
-	imap.endImap();
 }
 
 async function outlookReplies(campaignAnalytics, sender, campaign) {
@@ -178,6 +65,116 @@ async function outlookReplies(campaignAnalytics, sender, campaign) {
 				}
 			}
 		}
+	}
+}
+async function imapConnection(sender) {
+	try {
+		const imap = await Imap.connect({ mailbox: sender });
+		imap.connection.on('error', (e) => {
+			console.log('connection error', e);
+		});
+		const inboxFolder = await imap.getInboxFolder();
+		console.log('inboxFolder----', inboxFolder);
+		await imap.openFolder(inboxFolder.path);
+		return imap;
+	} catch (e) {
+		console.log('connection error', e);
+	}
+}
+async function imapReplies(campaignAnalytics, sender, campaign) {
+	const imap = await imapConnection(sender).catch((err) => {
+		log(
+			`Imap Error: sender ${sender.email} , provider: ${sender.provider} campaing: ${
+				campaign.name
+			} , Error: ${err.message || err}`,
+			{
+				debug: true,
+				error: true,
+				er: err,
+			}
+		);
+	});
+
+	for (const campaignAnalytic of campaignAnalytics) {
+		const { messageId } = campaignAnalytic;
+		const { receivedReplies, emailsBounced } = campaignAnalytic;
+		if (!receivedReplies && !emailsBounced) {
+			if (!imap) {
+				log(`imap is null for sender: ${sender.email}`, {
+					debug: true,
+				});
+				return;
+			}
+			const fetchOptions = {
+				bodies: ['HEADER'],
+			};
+			const inboxEmails = await imap.search([['HEADER', 'In-Reply-To', messageId]], fetchOptions);
+
+			log(`imap or google reply ---inboxEmails: ${inboxEmails}`, {
+				debug: true,
+				flags: (inboxEmails && inboxEmails[0]?.attributes.flags) || '',
+				failedRecipient:
+					(inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients']) || '',
+				sender: sender.email,
+				messageId,
+			});
+			if (inboxEmails && inboxEmails[0]?.parts[0].body['x-failed-recipients']?.length > 0) {
+				if (!emailsBounced) await updateCampaignAnalytic(campaignAnalytic._id, 0, 1);
+			} else if (inboxEmails.length) {
+				console.log('inboxEmails.length', inboxEmails.length);
+				if (!receivedReplies) await updateCampaignAnalytic(campaignAnalytic._id, 1, 0);
+			}
+		}
+	}
+
+	await imap.closeImap();
+	imap.endImap();
+}
+async function processAnalyticExecutioner(senderObj) {
+	const { sender, campaigns } = senderObj;
+	if (!sender || campaigns?.length < 1) throw new Error('sender or campaign list not available');
+
+	log(
+		`campaign analytic start Execution for campaign length ${campaigns?.length} , sender email: ${sender.email}`,
+		{ debug: true }
+	);
+
+	const currentCampaignIndex = getCacheData(String(sender?._id)) || 0;
+	let campaign;
+	if (campaigns?.length === 1) {
+		campaign = campaigns[0];
+	} else {
+		campaign = campaigns[currentCampaignIndex];
+		setCacheData(String(sender._id), (currentCampaignIndex + 1) % campaigns.length, 18000);
+	}
+
+	if (!campaign) return;
+
+	const query = { campaignId: campaign._id, senderId: sender._id };
+
+	const campaignAnalytics = await Campaign.getCampaignAnalytic(query);
+	if (!campaignAnalytics?.length) return;
+
+	// console.log(
+	// 	'campaignAnalytics-------------------',
+	// 	currentCampaignIndex,
+	// 	campaign.name,
+	// 	sender.email,
+	// 	campaignAnalytics.length,
+	// 	campaignAnalytics[0]
+	// );
+	try {
+		if (sender.provider === 'outlook') {
+			await outlookReplies(campaignAnalytics, sender, campaign);
+		} else {
+			await imapReplies(campaignAnalytics, sender, campaign);
+		}
+	} catch (err) {
+		log(`processAnalyticExecutioner Error: ${err?.message || err} sender: ${sender.email} `, {
+			error: true,
+			debug: true,
+			er: err,
+		});
 	}
 }
 
