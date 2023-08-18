@@ -18,7 +18,7 @@ class AuthProvider {
 
 	async getAccessToken() {
 		let mailbox;
-		mailbox = await db('mailboxes').findOne({ _id: this.mailboxId });
+		mailbox = await MailboxModel.findOne({ _id: this.mailboxId });
 
 		const isAboutToExpire = new Date(mailbox.social.expiresAt).getTime() < Date.now();
 

@@ -4,7 +4,7 @@ metadata:
   name: pribox-analytics-service
   namespace: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       name: pribox-analytics-service

@@ -1,58 +1,5 @@
-import imap from 'imap-simple';
-import nodemailer from 'nodemailer';
 import emailProvidersConfig from '../constant/emailProviders';
 import { getDecryptedPassword } from '../utils/encryption';
-
-// export function verifyConnection(args) {
-// 	const smtpTransporter = nodemailer.createTransport(getSMTPConfig(args));
-// 	const smtpPromise = new Promise((resolve, reject) => {
-// 		smtpTransporter.verify((error, success) => {
-// 			if (success) return resolve(true);
-// 			reject(error.message);
-// 		});
-// 	});
-// 	const imapConnection = imap.connect({
-// 		imap: getIMAPConfig(args)
-// 	});
-
-// 	return Promise.all([smtpPromise, imapConnection]);
-// }
-
-// const smtpPoolingOptions = {
-// 	pool: true,
-// 	maxConnections:500, // simuteosly connection from job that will come!
-// };
-
-// export function getSMTPConfig(args, decrypt = true) {
-// 	const providerObj = emailProvidersConfig[args.provider];
-// 	const type = 'smtp';
-
-// 	switch (args.provider) {
-// 		case 'other':
-// 		case 'custom':
-// 			return {
-// 				port: args[type].port,
-// 				host: args[type].host,
-// 				auth: {
-// 					user: args[type].username,
-// 					pass: decrypt ? getDecryptedPassword(args[type].password) : args[type].password
-// 				},
-// 				...smtpPoolingOptions
-// 			};
-// 		default:
-// 			return {
-// 				port: providerObj[type].port,
-// 				host: providerObj[type].host,
-// 				// secure: providerObj[type].secure,
-// 				// secureConnection: false,
-// 				auth: {
-// 					user: args.email,
-// 					pass: decrypt ? getDecryptedPassword(args.password) : args.password
-// 				},
-// 				...smtpPoolingOptions
-// 			};
-// 	}
-// }
 
 export function getIMAPConfig(args, decrypt = true) {
 	const providerObj = emailProvidersConfig[args.provider];

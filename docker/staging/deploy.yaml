@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pribox-analytics-service
-  namespace: default
+  namespace: staging
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       name: pribox-analytics-service
@@ -14,7 +14,7 @@ spec:
         name: pribox-analytics-service
     spec:
       containers:
-      - image: pribox.azurecr.io/pribox-analytics-service
+      - image: pribox.azurecr.io/pribox-analytics-service-staging
         imagePullPolicy: Always
         name: pribox-analytics-service
         envFrom:
@@ -26,9 +26,9 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: pribox-analytics-service
+    service.beta.kubernetes.io/azure-dns-label-name: pribox-analytics-service-staging
   name: pribox-analytics-service
-  namespace: default
+  namespace: staging
   labels:
     name: pribox-analytics-service
 spec:

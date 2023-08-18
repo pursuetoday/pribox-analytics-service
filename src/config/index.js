@@ -1,3 +1,15 @@
+import dotenv from 'dotenv';
+import { shortenedEnvs } from '../constant';
+
+export const isProd = process.env.NODE_ENV === 'production';
+export const isStaging = process.env.NODE_ENV === 'staging';
+export const isDevLive = process.env.NODE_ENV === 'development';
+export const local = process.env.NODE_ENV === 'dev-local';
+
+dotenv.config(
+	(!isProd || !isDevLive || !local) && { path: `.env.${shortenedEnvs[process.env.NODE_ENV]}` }
+);
+
 export const port = process.env.PORT || 5003;
 export const env = process.env.NODE_ENV || 'development';
 
@@ -44,3 +56,13 @@ export const OUTLOOK_CREDS = {
 	],
 	redirect_uri: REDIRECT_URI,
 };
+
+export const SENTRY_DNS =
+	process.env.SENTRY_DNS ||
+	'https://2f4702e16d7b4fc18d37e295fc2edb6d@o4505550487879680.ingest.sentry.io/4505589630763008';
+
+export const SENTRY_ENV = process.env.NODE_ENV;
+
+export const SLACK_SERVICE_URL =
+	process.env.SLACK_SERVICE_URL ||
+	'https://hooks.slack.com/services/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';

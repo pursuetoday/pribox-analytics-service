@@ -3,11 +3,13 @@ import mongoose from 'mongoose';
 const Schema = new mongoose.Schema(
 	{
 		name: String,
-		sender: {
-			type: mongoose.Schema.Types.ObjectId,
-			index: true,
-			ref: 'mailbox',
-		},
+		sender: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				index: true,
+				ref: 'mailbox',
+			},
+		],
 		status: {
 			type: String,
 			enum: ['draft', 'ready', 'active', 'paused', 'completed'],

@@ -7,7 +7,7 @@ const Schema = new mongoose.Schema(
 			ref: 'campaign',
 			required: true,
 		},
-		flowItemId: {
+		nodeItemId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'campaign_flow',
 			required: true,
@@ -18,11 +18,12 @@ const Schema = new mongoose.Schema(
 			required: true,
 			index: true,
 		},
-		campaignEmailQueueId: {
+		senderId: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'campaign_email_queue',
+			ref: 'mailbox',
+			required: true,
 		},
-		flowItemRefData: {
+		nodeItemRefData: {
 			type: [String],
 			default: [],
 		},
@@ -58,4 +59,4 @@ Schema.set('toJSON', {
 	virtuals: true,
 });
 
-export default mongoose.model('campaign_flow_track', Schema);
+export default mongoose.model('campaign_simulation', Schema);
