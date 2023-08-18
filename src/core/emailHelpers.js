@@ -1,6 +1,8 @@
 import emailProvidersConfig from '../constant/emailProviders';
 import { getDecryptedPassword } from '../utils/encryption';
 
+export const base64 = (data) => Buffer.from(data).toString('base64');
+
 export function getIMAPConfig(args, decrypt = true) {
 	const providerObj = emailProvidersConfig[args.provider];
 	const type = 'imap';
@@ -45,5 +47,3 @@ export function getIMAPConfig(args, decrypt = true) {
 			};
 	}
 }
-
-export const base64 = (data) => Buffer.from(data).toString('base64');
