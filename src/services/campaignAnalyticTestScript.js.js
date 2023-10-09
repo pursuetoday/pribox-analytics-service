@@ -6,55 +6,38 @@ import Imap from '../core/imap';
 import Campaign from '../campaignAnalytics/campaign';
 import log from '../utils/log';
 
-export const campaignAnalyticTestScript = async (campaignId, sender, open, click) => {
+const clickOnLink = async (url) => {
+	const clearURL = url.replace(/"/g, '');
+	// log(`Url for clearURL:- ${clearURL}`, {
+	// 	debug: true,
+	// });
 	try {
-		log(`campaignId with start ${campaignId}`, { debug: true });
-
-		const campaign = await Campaign.getCampaign(campaignId);
-		const prospects = await Campaign.getProspects(campaign);
-
-		const emailProspect = prospects.map((e) => e.email);
-
-		// log(
-		// 	`emailProspect ${emailProspect} , campaign: ${campaign} , prospects: ${prospects}`,
-		// 	{ debug: true }
-		// );
-
-		const receivers = await Campaign.getSendersByEmails(emailProspect);
-
-		// log(`receivers ${receivers}`, { debug: true });
-		let openCount = 0;
-
-		for (const receiver of receivers) {
-			try {
-				console.log('Count..................................', openCount, click, open);
-				let isOpen;
-				if (openCount < parseInt(open)) {
-					isOpen = true;
-					openCount++;
-				} else {
-					openCount++;
-					isOpen = false;
-				}
-				if (receiver?.provider === 'outlook') {
-					await interactViaOutlook(receiver._id, sender, isOpen);
-				} else {
-					await interactViaIMAP(receiver, sender, isOpen);
-				}
-			} catch (err) {
-				console.log('err-------', err.message, receiver.provider, receiver.email);
-				continue;
-			}
+		const res = await axios.get(clearURL);
+		if (res) {
+			log('Request res:-', {
+				res,
+				debug: true,
+			});
 		}
-		return true;
 	} catch (error) {
-		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
-			debug: true,
+		log('Request Error for test campaign script:---', {
 			error,
-			er: error,
+			debug: true,
 		});
+		if (error) return true;
 	}
 };
+
+const filterURL = (tag, property, message) => {
+	if (!message) return;
+
+	const convertedString = message.replace(/=\r\n/g, '');
+	const dom = new JSDOM(convertedString);
+	const hrefValue = dom.window.document.querySelector(tag).getAttribute(property);
+	const url = hrefValue.replace(/3D/g, '');
+	return url;
+};
+
 async function interactViaIMAP(receiver, sender, isOpen = false) {
 	const fetchOptions = {
 		bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)', 'TEXT'],
@@ -153,34 +136,52 @@ async function interactViaOutlook(toMailbox, sender, isOpen = false) {
 		}
 	}
 }
-const clickOnLink = async (url) => {
-	const clearURL = url.replace(/"/g, '');
-	// log(`Url for clearURL:- ${clearURL}`, {
-	// 	debug: true,
-	// });
+export const campaignAnalyticTestScript = async (campaignId, sender, open, click) => {
 	try {
-		const res = await axios.get(clearURL);
-		if (res) {
-			log('Request res:-', {
-				res,
-				debug: true,
-			});
+		log(`campaignId with start ${campaignId}`, { debug: true });
+
+		const campaign = await Campaign.getCampaign(campaignId);
+		const prospects = await Campaign.getProspects(campaign);
+
+		const emailProspect = prospects.map((e) => e.email);
+
+		// log(
+		// 	`emailProspect ${emailProspect} , campaign: ${campaign} , prospects: ${prospects}`,
+		// 	{ debug: true }
+		// );
+
+		const receivers = await Campaign.getSendersByEmails(emailProspect);
+
+		// log(`receivers ${receivers}`, { debug: true });
+		let openCount = 0;
+
+		for (const receiver of receivers) {
+			try {
+				console.log('Count..................................', openCount, click, open);
+				let isOpen;
+				if (openCount < parseInt(open, 10)) {
+					isOpen = true;
+					openCount++;
+				} else {
+					openCount++;
+					isOpen = false;
+				}
+				if (receiver?.provider === 'outlook') {
+					await interactViaOutlook(receiver._id, sender, isOpen);
+				} else {
+					await interactViaIMAP(receiver, sender, isOpen);
+				}
+			} catch (err) {
+				console.log('err-------', err.message, receiver.provider, receiver.email);
+				continue;
+			}
 		}
+		return true;
 	} catch (error) {
-		log('Request Error for test campaign script:---', {
-			error,
+		log(`Failed to campaignAnalyticTestScript Error: ${error}`, {
 			debug: true,
+			error,
+			er: error,
 		});
-		if (error) return true;
 	}
-};
-
-const filterURL = (tag, property, message) => {
-	if (!message) return;
-
-	const convertedString = message.replace(/=\r\n/g, '');
-	const dom = new JSDOM(convertedString);
-	const hrefValue = dom.window.document.querySelector(tag).getAttribute(property);
-	const url = hrefValue.replace(/3D/g, '');
-	return url;
 };

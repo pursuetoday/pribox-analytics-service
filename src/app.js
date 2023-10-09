@@ -1,8 +1,9 @@
 import express from 'express';
 import * as Sentry from '@sentry/node';
-import jobScheduler from './campaignAnalytics/jobScheduler';
-import connectDatabase from './connections/database';
+
 import { SENTRY_ENV, SENTRY_DNS } from './config';
+import connectDatabase from './connections/database';
+import jobScheduler from './campaignAnalytics/jobScheduler';
 
 const app = express();
 

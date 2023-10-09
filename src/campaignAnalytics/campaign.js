@@ -132,6 +132,7 @@ async function saveCampaignAnalytics(newData) {
 	try {
 		const options = { upsert: true, returnDocument: 'after' };
 		const { value } = await CampaignAnalyticModel.findOneAndUpdate(newData, { $set: {} }, options);
+		console.log('==> saveCampaignAnalytics', JSON.stringify({ newData, value }));
 		return value;
 	} catch (error) {
 		console.error(error);
@@ -141,10 +142,12 @@ async function saveCampaignAnalytics(newData) {
 async function updateCampaignAnalytic(query, updateObj) {
 	// const {campaignId , prospectId , variantId} = query
 	// const {status} = updateObj
+	console.log('==> updateCampaignAnalytic', JSON.stringify({ query, updateObj }));
 	try {
 		const updateAnalytic = await CampaignAnalyticModel.updateOne(query, {
 			$set: updateObj,
 		});
+		console.log('==> 01 updateCampaignAnalytic', JSON.stringify({ updateAnalytic }));
 		return updateAnalytic;
 	} catch (error) {
 		console.error(error);

@@ -10,6 +10,15 @@ function getRefreshToken(oAuthClient) {
 	const refreshToken = refreshTokenObject[Object.keys(refreshTokenObject)[0]]?.secret;
 	return refreshToken;
 }
+function getOAuth2Client() {
+	return new ConfidentialClientApplication({
+		auth: {
+			clientId: OUTLOOK_CREDS.client_id,
+			authority: OUTLOOK_CREDS.authority,
+			clientSecret: OUTLOOK_CREDS.client_secret,
+		},
+	});
+}
 
 class AuthProvider {
 	constructor(mailboxId) {
@@ -45,16 +54,6 @@ class AuthProvider {
 		}
 		return mailbox.social.accessToken;
 	}
-}
-
-function getOAuth2Client() {
-	return new ConfidentialClientApplication({
-		auth: {
-			clientId: OUTLOOK_CREDS.client_id,
-			authority: OUTLOOK_CREDS.authority,
-			clientSecret: OUTLOOK_CREDS.client_secret,
-		},
-	});
 }
 
 export function getApiClient(mailboxId) {

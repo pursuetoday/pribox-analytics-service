@@ -1,7 +1,7 @@
 import { map } from 'lodash';
+import promiseLimit from 'promise-limit';
 import Campaign from '../campaign';
 import log from '../../utils/log';
-import promiseLimit from 'promise-limit';
 import analyticExecutioner from './analyticExecution';
 
 const pLimit = promiseLimit(10);

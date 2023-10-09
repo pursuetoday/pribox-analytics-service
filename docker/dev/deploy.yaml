@@ -14,19 +14,19 @@ spec:
         name: pribox-analytics-service
     spec:
       containers:
-      - image: pribox.azurecr.io/pribox-analytics-service-dev
-        imagePullPolicy: Always
-        name: pribox-analytics-service
-        envFrom:
-        - secretRef:
-            name: "config-pribox-analytics-service"
+        - image: pribox.azurecr.io/pribox-analytics-service-dev
+          imagePullPolicy: Always
+          name: pribox-analytics-service
+          envFrom:
+            - secretRef:
+                name: 'config-pribox-analytics-service'
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: pribox-analytics-service
+    service.beta.kubernetes.io/azure-dns-label-name: pribox-analytics-service-dev
   name: pribox-analytics-service
   namespace: dev
   labels:
@@ -34,9 +34,9 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - name: http 
-    port: 5003
-    targetPort: 5003
+    - name: http
+      port: 5003
+      targetPort: 5003
   selector:
     name: pribox-analytics-service
 ---
